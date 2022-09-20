@@ -3,7 +3,15 @@
 
 void GLWindow::initializeGL() {
 	glewInit();
+	sendData();
+	installShaders();
+}
 
+void GLWindow::installShaders() {
+
+}
+
+void GLWindow::sendData() {
 	GLfloat vertices[] = {
 		0.0f, 1.0f,
 		1.0f, 0.0f, 0.0f,
@@ -25,12 +33,12 @@ void GLWindow::initializeGL() {
 
 	// Buffer Data needs a buffer binding point = GL_ARRAY_BUFFER (or GL_ELEMENT_ARRAY_BUFFER) instead of buffer id
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	
+
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, 0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0);
 
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, (char*)(sizeof(float) * 2));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (char*)(sizeof(float) * 2));
 
 	GLushort indices[] = { 0,1,4, 0,3,2 };
 	GLuint indexBufferID;
@@ -41,7 +49,6 @@ void GLWindow::initializeGL() {
 
 	/*glCreateShader(GL_VERTEX_SHADER);
 	glCreateShader(GL_FRAGMENT_SHADER);*/
-
 }
 
 void GLWindow::paintGL() {
