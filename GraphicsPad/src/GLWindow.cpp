@@ -1,14 +1,11 @@
 #include <gl\glew.h>
 #include "GLWindow.h"
+#include "ShaderLoader.h"
 
 void GLWindow::initializeGL() {
 	glewInit();
 	sendData();
 	installShaders();
-}
-
-void GLWindow::installShaders() {
-
 }
 
 void GLWindow::sendData() {
@@ -51,11 +48,36 @@ void GLWindow::sendData() {
 	glCreateShader(GL_FRAGMENT_SHADER);*/
 }
 
+void GLWindow::installShaders() {
+	GLuint vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
+	GLuint fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
+
+	ShaderSource source = GetShaderSource("resources/shaders/BasicColorPassing.shader");
+	/*std::cout << "Vertex Shader::\n" << source.VertexSource << std::endl;
+	std::cout << "Fragment Shader::\n" << source.FragmentSource << std::endl;*/
+	const char* adapter[1];
+	adapter[0] = source.VertexSource.c_str();
+	glShaderSource(vertexShaderID, 1, adapter, 0);
+	adapter[0] = source.FragmentSource.c_str();
+	glShaderSource(fragmentShaderID, 1, adapter, 0);
+
+	glCompileShader(vertexShaderID);
+	glCompileShader(fragmentShaderID);
+
+	GLuint programID = glCreateProgram();
+	glAttachShader(programID, vertexShaderID);
+	glAttachShader(programID, fragmentShaderID);
+	glLinkProgram(programID);
+
+	glUseProgram(programID);
+}
+
 void GLWindow::paintGL() {
 	glViewport(0, 0, width(), height());
 	glClearColor(0.2f, 0.2f, 0, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	
+	//glDrawArrays(GL_TRIANGLES, 0, 6);
 
-	//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
 }
