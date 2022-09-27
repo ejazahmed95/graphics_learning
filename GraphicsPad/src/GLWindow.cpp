@@ -11,17 +11,17 @@ void GLWindow::initializeGL() {
 void GLWindow::sendData() {
 	GLfloat vertices[] = {
 		0.0f, 1.0f,
-		1.0f, 0.0f, 0.0f,
+		0.2f, 0.5f, 0.8f,
 		1.0f, -0.5f,
-		1.0f, 0.0f, 0.0f,
+		0.4f, 0.8f, 0.2f,
 		-1.0f, -0.5f,
-		1.0f, 0.0f, 0.0f,
+		0.8f, 0.2f, 0.4f,
 		0.0f, -1.0f,
-		0.0f, 1.0f, 0.0f,
+		0.8f, 0.2f, 0.4f,
 		-1.0f, 0.5f,
-		0.0f, 1.0f, 0.0f,
+		0.4f, 0.8f, 0.2f,
 		1.0f, 0.5f,
-		0.0f, 1.0f, 0.0f,
+		0.2f, 0.1f, 0.7f,
 	};
 
 	GLuint bufferID;
@@ -73,11 +73,11 @@ void GLWindow::installShaders() {
 }
 
 void GLWindow::paintGL() {
-	glViewport(0, 0, width(), height());
-	glClearColor(0.2f, 0.2f, 0, 1.0f);
+	glViewport(width() / 4, 0, width() / 2, height());
+	glClearColor(0.9f, 0.8f, 0, 0.1f);
 	glClear(GL_COLOR_BUFFER_BIT);
 	
-	//glDrawArrays(GL_TRIANGLES, 0, 6);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
 
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+	//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
 }

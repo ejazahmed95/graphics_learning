@@ -21,9 +21,9 @@ ShaderSource GetShaderSource(const char* fileName)
 			currentSource++;
 		} else {
 			//std::cout << "Line = " <<currentSource << "  " << line << std::endl;
-			ss[currentSource] << line <<"\n";
+			ss[currentSource] << line << "\n";
 		}
 	}
 	
-	return { ss[0].str(), ss[1].str()};
+	return { ss[0].str(), ss[1].str() };
 }
