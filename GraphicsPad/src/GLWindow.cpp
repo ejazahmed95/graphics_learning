@@ -21,11 +21,11 @@ void GLWindow::initData()
 	vel1 = { 0.0f, 0.0f };
 	vel2 = { 0.0f, 0.0f };
 	scale1 = { 1.0f, 1.0f };
-	scale2 = { 2.0f, 2.0f };
+	scale2 = { 1.5f, 1.5f };
 	offset1 = { 0.4f, 0.1f };
 	offset2 = { -0.4f, 0.1f };
-	color1 = { 1.0f, 0.0f, 0.0f };
-	color2 = { 0.0f, 0.0f, 1.0f };
+	color1 = { 0.9f, 0.3f, 0.0f };
+	color2 = { 0.0f, 0.3f, 0.9f };
 }
 
 void GLWindow::sendData() {
@@ -107,29 +107,40 @@ void GLWindow::paintGL() {
 
 	//std::cout << "{" << offset1.x  << ", " << offset1.y << "}" << std::endl;
 	glViewport(width() / 4, 0, width() / 2, height());
-	glClearColor(+0.9f, +0.8f, 0, +0.1f);
+	glClearColor(+0.9f, +0.8f, 0.4f, +0.1f);
 	glClear(GL_COLOR_BUFFER_BIT);
 	
 	// Box
-	glUniform3f(colorId, 0.6f, 0.6f, 0.6f);
+	glUniform3f(colorId, 0.5f, 0.7f, 0.5f);
 	glUniform2f(scaleId, 1.0f, 1.0f);
 	glUniform2f(offsetId, 0.0f, 0.0f);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_SHORT, (GLvoid*)(sizeof(GLshort)*3));
 
 	// Player 1
 	glUniform3f(colorId, color1.x, color1.y, color1.z);
-	glUniform2f(scaleId, 2.0f, 2.0f);
+	glUniform2f(scaleId, scale1.x, scale1.y);
 	glUniform2f(offsetId, offset1.x, offset1.y);
 	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
 
 	// Player 2
 	glUniform3f(colorId, color2.x, color2.y, color2.z);
-	glUniform2f(scaleId, 1.0f, 1.0f);
+	glUniform2f(scaleId, scale2.x, scale2.y);
 	glUniform2f(offsetId, offset2.x, offset2.y);
 	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
 
 }
 
+
+Vec2 GLWindow::translatePos(Vec2 initialPos, Vec2 speed, Vec4 bounds)
+{
+	float xPos = initialPos.x + speed.x * deltaTime;
+	float yPos = initialPos.y + speed.y * deltaTime;
+	if (xPos < bounds.x) xPos = bounds.x;
+	if (xPos > bounds.y) xPos = bounds.y;
+	if (yPos < bounds.z) yPos = bounds.z;
+	if (yPos > bounds.w) yPos = bounds.w;
+	return { xPos, yPos };
+}
 
 /// <summary>
 /// Input Handling

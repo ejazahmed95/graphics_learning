@@ -11,9 +11,10 @@ protected:
 	virtual void keyPressEvent(QKeyEvent*) override; // Function defined in QWidget
 	virtual void keyReleaseEvent(QKeyEvent*) override; // Function defined in QWidget
 private:
-	void installShaders();
-	void sendData();
 	void initData();
+	void sendData();
+	void installShaders();
+	
 	void handleInput(QKeyEvent* event, bool pressed);
 	Vec2 translatePos(Vec2 initialPos, Vec2 speed, Vec4 bounds);
 
