@@ -8,8 +8,10 @@
   <ItemGroup>
     <ClInclude Include="src\GLWindow.h" />
     <ClInclude Include="src\ShaderLoader.h" />
+    <ClInclude Include="src\Types.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BasicColorPassing.shader" />
+    <None Include="resources\shaders\BasicTransformation.shader" />
   </ItemGroup>
 </Project>
