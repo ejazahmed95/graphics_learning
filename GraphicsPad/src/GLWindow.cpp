@@ -10,6 +10,24 @@ void GLWindow::initializeGL() {
 	installShaders();
 }
 
+/// <summary>
+/// Data Setup; Initializing Shaders
+/// </summary>
+void GLWindow::initData()
+{
+	deltaTime = 0.2f;
+	speed1 = 0.5f;
+	speed2 = 0.5f;
+	vel1 = { 0.0f, 0.0f };
+	vel2 = { 0.0f, 0.0f };
+	scale1 = { 1.0f, 1.0f };
+	scale2 = { 2.0f, 2.0f };
+	offset1 = { 0.4f, 0.1f };
+	offset2 = { -0.4f, 0.1f };
+	color1 = { 1.0f, 0.0f, 0.0f };
+	color2 = { 0.0f, 0.0f, 1.0f };
+}
+
 void GLWindow::sendData() {
 	Vertex vertices[] = {
 		+0.0f, +0.1f,
@@ -52,32 +70,6 @@ void GLWindow::sendData() {
 	glCreateShader(GL_FRAGMENT_SHADER);*/
 }
 
-void GLWindow::initData()
-{
-	deltaTime = 0.2f;
-	speed1 = 0.5f;
-	speed2 = 0.5f;
-	vel1 = { 0.0f, 0.0f };
-	vel2 = { 0.0f, 0.0f };
-	scale1 = { 1.0f, 1.0f };
-	scale2 = { 2.0f, 2.0f };
-	offset1 = { 0.4f, 0.1f };
-	offset2 = { -0.4f, 0.1f };
-	color1 = { 1.0f, 0.0f, 0.0f };
-	color2 = { 0.0f, 0.0f, 1.0f };
-}
-
-Vec2 GLWindow::translatePos(Vec2 initialPos, Vec2 speed, Vec4 bounds)
-{
-	float xPos = initialPos.x + speed.x * deltaTime;
-	float yPos = initialPos.y + speed.y * deltaTime;
-	if (xPos < bounds.x) xPos = bounds.x;
-	if (xPos > bounds.y) xPos = bounds.y;
-	if (yPos < bounds.z) yPos = bounds.z;
-	if (yPos > bounds.w) yPos = bounds.w;
-	return {xPos, yPos};
-}
-
 void GLWindow::installShaders() {
 	GLuint vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
 	GLuint fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
@@ -106,6 +98,9 @@ void GLWindow::installShaders() {
 	glUseProgram(programID);
 }
 
+/// <summary>
+/// Painting the Window
+/// </summary>
 void GLWindow::paintGL() {
 	offset1 = translatePos(offset1, vel1 * deltaTime, Vec4{ -0.8f, 0.8f, -0.8f, 0.8f });
 	offset2 = translatePos(offset2, vel2 * deltaTime, Vec4{ -0.8f, 0.8f, -0.8f, 0.8f });
@@ -135,6 +130,11 @@ void GLWindow::paintGL() {
 
 }
 
+
+/// <summary>
+/// Input Handling
+/// </summary>
+/// <param name="event"></param>
 void GLWindow::keyPressEvent(QKeyEvent* event) {
 	handleInput(event, true);
 }
@@ -177,4 +177,3 @@ void GLWindow::handleInput(QKeyEvent* event, bool pressed)
 	//std::cout << "{" << vel1.x << ", " << vel1.y << "}" << std::endl;
 	repaint();
 }
-
