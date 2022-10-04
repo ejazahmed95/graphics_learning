@@ -1,7 +1,7 @@
 #include <gl\glew.h>
 #include "GLWindow.h"
 #include "ShaderLoader.h"
-#include <iostream>
+//#include <iostream>
 
 void GLWindow::initializeGL() {
 	glewInit();
@@ -47,27 +47,24 @@ void GLWindow::sendData() {
 		+0.8f, +0.8f, +0.8f,
 	};
 
+	GLushort indices[] = { 0,1,2, 3,4,5,6 };
+	
+
 	GLuint bufferID;
 	glGenBuffers(1, &bufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, bufferID);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
 
 	// Buffer Data needs a buffer binding point = GL_ARRAY_BUFFER (or GL_ELEMENT_ARRAY_BUFFER) instead of buffer id
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex)*7 + sizeof(indices), 0, GL_STATIC_DRAW);
+	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Vertex) * 7, sizeof(indices), indices);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0);
 
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (char*)(sizeof(float) * 2));
-
-	GLushort indices[] = {0,1,2, 3,4,5,6};
-	GLuint indexBufferID;
-	glGenBuffers(1, &indexBufferID);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	/*glCreateShader(GL_VERTEX_SHADER);
-	glCreateShader(GL_FRAGMENT_SHADER);*/
 }
 
 void GLWindow::installShaders() {
@@ -109,24 +106,25 @@ void GLWindow::paintGL() {
 	glViewport(width() / 4, 0, width() / 2, height());
 	glClearColor(+0.9f, +0.8f, 0.4f, +0.1f);
 	glClear(GL_COLOR_BUFFER_BIT);
-	
+
 	// Box
 	glUniform3f(colorId, 0.5f, 0.7f, 0.5f);
 	glUniform2f(scaleId, 1.0f, 1.0f);
 	glUniform2f(offsetId, 0.0f, 0.0f);
-	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_SHORT, (GLvoid*)(sizeof(GLshort)*3));
+
+	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_SHORT, (GLvoid*)(sizeof(Vertex) * 7 + sizeof(GLshort)*3));
 
 	// Player 1
 	glUniform3f(colorId, color1.x, color1.y, color1.z);
 	glUniform2f(scaleId, scale1.x, scale1.y);
 	glUniform2f(offsetId, offset1.x, offset1.y);
-	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
+	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, (GLvoid*)(sizeof(Vertex) * 7));
 
 	// Player 2
 	glUniform3f(colorId, color2.x, color2.y, color2.z);
 	glUniform2f(scaleId, scale2.x, scale2.y);
 	glUniform2f(offsetId, offset2.x, offset2.y);
-	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
+	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, (GLvoid*)(sizeof(Vertex) * 7));
 
 }
 
