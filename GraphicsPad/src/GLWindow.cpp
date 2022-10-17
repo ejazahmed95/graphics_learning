@@ -2,6 +2,9 @@
 #include "GLWindow.h"
 #include "ShaderLoader.h"
 #include <core/ShapeGenerator.h>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 //#include <iostream>
 
 void GLWindow::initializeGL() {
@@ -29,6 +32,7 @@ void GLWindow::initData()
 	color2 = { 0.0f, 0.3f, 0.9f };
 
 	triangle = ShapeGenerator::Triangle();
+	cube = ShapeGenerator::Cube();
 }
 
 void GLWindow::sendData() {
@@ -44,34 +48,48 @@ void GLWindow::sendData() {
 	};
 	GLushort indices[] = { 0, 1, 2, 3 };
 	GLsizeiptr currentPos = 0;
+	
 	// Generating Buffers(VBO) and Vertex Array Objects(VAO)
 	GLuint bufferID;
 	glGenBuffers(1, &bufferID);
 	glGenVertexArrays(1, &triangleVAO);
 	glGenVertexArrays(1, &shapeVAO);
+	glGenVertexArrays(1, &cubeVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, bufferID); // Binding the Vertex Buffer (VBO)
-	glBufferData(GL_ARRAY_BUFFER, triangle.vertexBufferSize() + triangle.indexBufferSize() + sizeof(vertices) + sizeof(indices), 0, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, triangle.fullBufferSize() + sizeof(vertices) + sizeof(indices) + cube.fullBufferSize(), 0, GL_STATIC_DRAW);
 
-	glBindVertexArray(triangleVAO); // All Vertex Attributes and Element Buffers will be bound to this VAO
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, triangle.vertexBufferSize(), triangle.vertices);	
-	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, triangle.vertexBufferSize(), triangle.indexBufferSize(), triangle.indices);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), 0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (char*)(sizeof(glm::vec3)));
-	glBindVertexArray(0);
+	glBindVertexArray(triangleVAO); { // All Vertex Attributes and Element Buffers will be bound to this VAO
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, triangle.vertexBufferSize(), triangle.vertices);
+		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, triangle.vertexBufferSize(), triangle.indexBufferSize(), triangle.indices);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), 0);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (char*)(sizeof(glm::vec3)));
+		currentPos += triangle.fullBufferSize();
+	} glBindVertexArray(0);
+	
+	glBindVertexArray(shapeVAO); {
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
+		glBufferSubData(GL_ARRAY_BUFFER, currentPos, sizeof(vertices), vertices); // Array Buffer does not care about VAO
+		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, currentPos + sizeof(vertices), sizeof(indices), indices);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (char*)(currentPos)); // Picks up from currently bound ARRAY_BUFFER
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (char*)(currentPos + sizeof(Vec2)));
+		currentPos += sizeof(vertices) + sizeof(indices);
+	} glBindVertexArray(0);
 
-	currentPos += triangle.vertexBufferSize() + triangle.indexBufferSize();
-	glBindVertexArray(shapeVAO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
-	glBufferSubData(GL_ARRAY_BUFFER, currentPos, sizeof(vertices), vertices); // Array Buffer does not care about VAO
-	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, currentPos + sizeof(vertices), sizeof(indices), indices);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (char*)(currentPos)); // Picks up from currently bound ARRAY_BUFFER
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (char*)(currentPos + sizeof(Vec2)));
-	glBindVertexArray(0);
+	glBindVertexArray(cubeVAO); {
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
+		glBufferSubData(GL_ARRAY_BUFFER, currentPos, cube.vertexBufferSize(), cube.indices); // Array Buffer does not care about VAO
+		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, currentPos + cube.vertexBufferSize(), cube.indexBufferSize(), cube.indices);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), 0);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (char*)(sizeof(glm::vec3)));
+		currentPos += cube.fullBufferSize();
+	} glBindVertexArray(0);
 }
 
 /// <summary>
@@ -86,28 +104,46 @@ void GLWindow::paintGL() {
 	glClearColor(+0.9f, +0.8f, 0.4f, +0.1f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glBindVertexArray(shapeVAO); // SHAPE
-	// Box
-	glUniform3f(colorId, 0.5f, 0.7f, 0.5f);
-	glUniform2f(scaleId, 1.0f, 1.0f);
-	glUniform2f(offsetId, 0.0f, 0.0f);
+	glUseProgram(triangleProgram); {
+		glBindVertexArray(shapeVAO); { // SHAPE
+			// Box
+			glUniform3f(colorId, 0.5f, 0.7f, 0.5f);
+			glUniform2f(scaleId, 1.0f, 1.0f);
+			glUniform2f(offsetId, 0.0f, 0.0f);
 
-	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_SHORT, (GLvoid*)(triangle.vertexBufferSize() + triangle.indexBufferSize() + sizeof(Vertex)*4));
-	glBindVertexArray(0);
+			glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_SHORT, (GLvoid*)(triangle.vertexBufferSize() + triangle.indexBufferSize() + sizeof(Vertex) * 4));
+		} glBindVertexArray(0);
 
-	glBindVertexArray(triangleVAO); // TRIANGLES
-	// Player 1
-	glUniform3f(colorId, color1.x, color1.y, color1.z);
-	glUniform2f(scaleId, scale1.x, scale1.y);
-	glUniform2f(offsetId, offset1.x, offset1.y);
-	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, (GLvoid*)(triangle.vertexBufferSize()));
+		glBindVertexArray(triangleVAO); { // TRIANGLES
+			// Player 1
+			glUniform3f(colorId, color1.x, color1.y, color1.z);
+			glUniform2f(scaleId, scale1.x, scale1.y);
+			glUniform2f(offsetId, offset1.x, offset1.y);
+			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, (GLvoid*)(triangle.vertexBufferSize()));
 
-	// Player 2
-	glUniform3f(colorId, color2.x, color2.y, color2.z);
-	glUniform2f(scaleId, scale2.x, scale2.y);
-	glUniform2f(offsetId, offset2.x, offset2.y);
-	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, (GLvoid*)(triangle.vertexBufferSize()));
-	glBindVertexArray(0);
+			// Player 2
+			glUniform3f(colorId, color2.x, color2.y, color2.z);
+			glUniform2f(scaleId, scale2.x, scale2.y);
+			glUniform2f(offsetId, offset2.x, offset2.y);
+			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, (GLvoid*)(triangle.vertexBufferSize()));
+		} glBindVertexArray(0);
+		
+	} glUseProgram(0);
+
+	glUseProgram(cubeProgram); {
+		using glm::mat4;
+		GLsizeiptr startPos = triangle.fullBufferSize() + sizeof(Vertex) * 4 + sizeof(GLushort) * 4;
+		mat4 translationMat = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, -1.0f));
+		mat4 rotationMat = glm::rotate(mat4(), 0.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+		mat4 projectionMat = glm::perspective(60.0f, ((float)width()) / height(), 0.1f, 10.0f);
+		mat4 transformMat = projectionMat * translationMat * rotationMat;
+
+		glBindVertexArray(cubeVAO); { // Cube
+			glUniformMatrix4fv(transformId, 1, GL_FALSE, &transformMat[0][0]);
+			glDrawElements(GL_TRIANGLES, cube.numIndices, GL_UNSIGNED_SHORT, (GLvoid*)(startPos + cube.vertexBufferSize()));
+		} glBindVertexArray(0);
+
+	} glUseProgram(0);
 
 }
 
@@ -128,16 +164,36 @@ void GLWindow::installShaders() {
 	glCompileShader(vertexShaderID);
 	glCompileShader(fragmentShaderID);
 
-	GLuint programID = glCreateProgram();
-	glAttachShader(programID, vertexShaderID);
-	glAttachShader(programID, fragmentShaderID);
-	glLinkProgram(programID);
+	triangleProgram = glCreateProgram();
+	glAttachShader(triangleProgram, vertexShaderID);
+	glAttachShader(triangleProgram, fragmentShaderID);
+	glLinkProgram(triangleProgram);
 
-	colorId = glGetUniformLocation(programID, "color");
-	scaleId = glGetUniformLocation(programID, "scale");
-	offsetId = glGetUniformLocation(programID, "offset");
+	colorId = glGetUniformLocation(triangleProgram, "color");
+	scaleId = glGetUniformLocation(triangleProgram, "scale");
+	offsetId = glGetUniformLocation(triangleProgram, "offset");
 
-	glUseProgram(programID);
+	/// <summary>
+	/// Cube Shader
+	/// </summary>
+	vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
+	fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
+
+	source = GetShaderSource("resources/shaders/MatTransformation.shader");
+	adapter[0] = source.VertexSource.c_str();
+	glShaderSource(vertexShaderID, 1, adapter, 0);
+	adapter[0] = source.FragmentSource.c_str();
+	glShaderSource(fragmentShaderID, 1, adapter, 0);
+
+	glCompileShader(vertexShaderID);
+	glCompileShader(fragmentShaderID);
+
+	cubeProgram = glCreateProgram();
+	glAttachShader(cubeProgram, vertexShaderID);
+	glAttachShader(cubeProgram, fragmentShaderID);
+	glLinkProgram(cubeProgram);
+
+	transformId = glGetUniformLocation(cubeProgram, "transformMat");
 }
 
 Vec2 GLWindow::translatePos(Vec2 initialPos, Vec2 speed, Vec4 bounds)

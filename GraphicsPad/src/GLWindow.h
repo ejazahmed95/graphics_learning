@@ -29,9 +29,12 @@ private:
 
 	// Uniforms
 	unsigned int colorId, scaleId, offsetId;
+	unsigned int transformId;
 
-	Shape triangle;
+	Shape triangle, cube;
 
-	GLuint triangleVAO, shapeVAO;
+	GLuint cubeVAO, triangleVAO, shapeVAO;
+	
+	GLuint triangleProgram, cubeProgram;
 };
 

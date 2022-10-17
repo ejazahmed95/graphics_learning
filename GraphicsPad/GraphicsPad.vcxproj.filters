@@ -16,5 +16,6 @@
   <ItemGroup>
     <None Include="resources\shaders\BasicColorPassing.shader" />
     <None Include="resources\shaders\BasicTransformation.shader" />
+    <None Include="resources\shaders\MatTransformation.shader" />
   </ItemGroup>
 </Project>

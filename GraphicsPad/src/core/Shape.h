@@ -22,6 +22,10 @@ struct Shape {
 		return numIndices * sizeof(GLushort);
 	}
 
+	GLsizeiptr fullBufferSize() const {
+		return vertexBufferSize() + indexBufferSize();
+	}
+
 	void cleanup() {
 		delete[] vertices;
 		delete[] indices;
