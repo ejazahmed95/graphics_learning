@@ -146,14 +146,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\core\ShapeGenerator.cpp" />
     <ClCompile Include="src\GLWindow.cpp" />
     <ClCompile Include="Mainer.cpp" />
     <ClCompile Include="src\ShaderLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\core\Shape.h" />
+    <ClInclude Include="src\core\ShapeGenerator.h" />
     <ClInclude Include="src\GLWindow.h" />
     <ClInclude Include="src\ShaderLoader.h" />
-    <ClInclude Include="src\Types.h" />
+    <ClInclude Include="src\core\Types.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BasicColorPassing.shader" />

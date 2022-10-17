@@ -1,6 +1,7 @@
-#include <gl\glew.h>
+#include <gl/glew.h>
 #include "GLWindow.h"
 #include "ShaderLoader.h"
+#include <core/ShapeGenerator.h>
 //#include <iostream>
 
 void GLWindow::initializeGL() {
@@ -20,35 +21,17 @@ void GLWindow::initData()
 	speed2 = 0.5f;
 	vel1 = { 0.0f, 0.0f };
 	vel2 = { 0.0f, 0.0f };
-	scale1 = { 1.0f, 1.0f };
-	scale2 = { 1.5f, 1.5f };
+	scale1 = { 0.1f, 0.1f };
+	scale2 = { 0.15f, 0.15f };
 	offset1 = { 0.4f, 0.1f };
 	offset2 = { -0.4f, 0.1f };
 	color1 = { 0.9f, 0.3f, 0.0f };
 	color2 = { 0.0f, 0.3f, 0.9f };
+
+	triangle = ShapeGenerator::Triangle();
 }
 
 void GLWindow::sendData() {
-	Vertex vertices[] = {
-		+0.0f, +0.1f,
-		+0.2f, +0.5f, +0.8f,
-		-0.05f, -0.05f,
-		+0.4f, +0.8f, +0.2f,
-		+0.05f, -0.05f,
-		+0.8f, +0.2f, +0.4f,
-
-		+0.9f, +0.9f,
-		+0.8f, +0.8f, +0.8f,
-		+0.9f, -0.9f,
-		+0.8f, +0.8f, +0.8f,
-		-0.9f, -0.9f,
-		+0.8f, +0.8f, +0.8f,
-		-0.9f, +0.9f,
-		+0.8f, +0.8f, +0.8f,
-	};
-
-	GLushort indices[] = { 0,1,2, 3,4,5,6 };
-	
 
 	GLuint bufferID;
 	glGenBuffers(1, &bufferID);
@@ -56,9 +39,9 @@ void GLWindow::sendData() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
 
 	// Buffer Data needs a buffer binding point = GL_ARRAY_BUFFER (or GL_ELEMENT_ARRAY_BUFFER) instead of buffer id
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex)*7 + sizeof(indices), 0, GL_STATIC_DRAW);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Vertex) * 7, sizeof(indices), indices);
+	glBufferData(GL_ARRAY_BUFFER, triangle.vertexBufferSize() + triangle.indexBufferSize(), 0, GL_STATIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, triangle.vertexBufferSize(), triangle.vertices);
+	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, triangle.vertexBufferSize(), triangle.indexBufferSize(), triangle.indices);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0);
@@ -66,6 +49,40 @@ void GLWindow::sendData() {
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (char*)(sizeof(float) * 2));
 }
+
+/// <summary>
+/// Painting the Window
+/// </summary>
+void GLWindow::paintGL() {
+	offset1 = translatePos(offset1, vel1 * deltaTime, Vec4{ -0.8f, 0.8f, -0.8f, 0.8f });
+	offset2 = translatePos(offset2, vel2 * deltaTime, Vec4{ -0.8f, 0.8f, -0.8f, 0.8f });
+
+	//std::cout << "{" << offset1.x  << ", " << offset1.y << "}" << std::endl;
+	glViewport(width() / 4, 0, width() / 2, height());
+	glClearColor(+0.9f, +0.8f, 0.4f, +0.1f);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	// Box
+	/*glUniform3f(colorId, 0.5f, 0.7f, 0.5f);
+	glUniform2f(scaleId, 1.0f, 1.0f);
+	glUniform2f(offsetId, 0.0f, 0.0f);
+
+	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_SHORT, (GLvoid*)(sizeof(Vertex) * 7 + sizeof(GLshort)*3));*/
+
+	// Player 1
+	glUniform3f(colorId, color1.x, color1.y, color1.z);
+	glUniform2f(scaleId, scale1.x, scale1.y);
+	glUniform2f(offsetId, offset1.x, offset1.y);
+	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, (GLvoid*)(triangle.vertexBufferSize()));
+
+	// Player 2
+	glUniform3f(colorId, color2.x, color2.y, color2.z);
+	glUniform2f(scaleId, scale2.x, scale2.y);
+	glUniform2f(offsetId, offset2.x, offset2.y);
+	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, (GLvoid*)(triangle.vertexBufferSize()));
+
+}
+
 
 void GLWindow::installShaders() {
 	GLuint vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
@@ -94,40 +111,6 @@ void GLWindow::installShaders() {
 
 	glUseProgram(programID);
 }
-
-/// <summary>
-/// Painting the Window
-/// </summary>
-void GLWindow::paintGL() {
-	offset1 = translatePos(offset1, vel1 * deltaTime, Vec4{ -0.8f, 0.8f, -0.8f, 0.8f });
-	offset2 = translatePos(offset2, vel2 * deltaTime, Vec4{ -0.8f, 0.8f, -0.8f, 0.8f });
-
-	//std::cout << "{" << offset1.x  << ", " << offset1.y << "}" << std::endl;
-	glViewport(width() / 4, 0, width() / 2, height());
-	glClearColor(+0.9f, +0.8f, 0.4f, +0.1f);
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	// Box
-	glUniform3f(colorId, 0.5f, 0.7f, 0.5f);
-	glUniform2f(scaleId, 1.0f, 1.0f);
-	glUniform2f(offsetId, 0.0f, 0.0f);
-
-	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_SHORT, (GLvoid*)(sizeof(Vertex) * 7 + sizeof(GLshort)*3));
-
-	// Player 1
-	glUniform3f(colorId, color1.x, color1.y, color1.z);
-	glUniform2f(scaleId, scale1.x, scale1.y);
-	glUniform2f(offsetId, offset1.x, offset1.y);
-	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, (GLvoid*)(sizeof(Vertex) * 7));
-
-	// Player 2
-	glUniform3f(colorId, color2.x, color2.y, color2.z);
-	glUniform2f(scaleId, scale2.x, scale2.y);
-	glUniform2f(offsetId, offset2.x, offset2.y);
-	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, (GLvoid*)(sizeof(Vertex) * 7));
-
-}
-
 
 Vec2 GLWindow::translatePos(Vec2 initialPos, Vec2 speed, Vec4 bounds)
 {
@@ -168,7 +151,7 @@ void GLWindow::handleInput(QKeyEvent* event, bool pressed)
 		vel1 = (Vec2{ 0, -speed1 }*factor);
 		break;
 	case 0x0044: // D
-		vel1 = (Vec2{ speed2, 0}*factor);
+		vel1 = (Vec2{ speed2, 0 }*factor);
 		break;
 	case Qt::Key::Key_Up: // W
 		vel2 = (Vec2{ 0, speed2 }*factor);

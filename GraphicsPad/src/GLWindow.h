@@ -1,7 +1,8 @@
 #pragma once
+#include <gl/glew.h>
 #include<QtOpenGL/qglWidget>
 #include<QtGui/qkeyevent>
-#include<Types.h>
+#include<core/Shape.h>
 #include<glm/glm.hpp>
 
 class GLWindow : public QGLWidget {
@@ -28,5 +29,7 @@ private:
 
 	// Uniforms
 	unsigned int colorId, scaleId, offsetId;
+
+	Shape triangle;
 };
 
