@@ -57,7 +57,7 @@ void GLWindow::sendData() {
 
 	// Buffer Data needs a buffer binding point = GL_ARRAY_BUFFER (or GL_ELEMENT_ARRAY_BUFFER) instead of buffer id
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex)*7 + sizeof(indices), 0, GL_STATIC_DRAW);
-	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
 	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Vertex) * 7, sizeof(indices), indices);
 
 	glEnableVertexAttribArray(0);
