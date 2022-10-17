@@ -32,22 +32,46 @@ void GLWindow::initData()
 }
 
 void GLWindow::sendData() {
-
+	Vertex vertices[] = {
+		+0.9f, +0.9f,
+		+0.8f, +0.8f, +0.8f,
+		+0.9f, -0.9f,
+		+0.8f, +0.8f, +0.8f,
+		-0.9f, -0.9f,
+		+0.8f, +0.8f, +0.8f,
+		-0.9f, +0.9f,
+		+0.8f, +0.8f, +0.8f,
+	};
+	GLushort indices[] = { 0, 1, 2, 3 };
+	GLsizeiptr currentPos = 0;
+	// Generating Buffers(VBO) and Vertex Array Objects(VAO)
 	GLuint bufferID;
 	glGenBuffers(1, &bufferID);
-	glBindBuffer(GL_ARRAY_BUFFER, bufferID);
+	glGenVertexArrays(1, &triangleVAO);
+	glGenVertexArrays(1, &shapeVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, bufferID); // Binding the Vertex Buffer (VBO)
+	glBufferData(GL_ARRAY_BUFFER, triangle.vertexBufferSize() + triangle.indexBufferSize() + sizeof(vertices) + sizeof(indices), 0, GL_STATIC_DRAW);
+
+	glBindVertexArray(triangleVAO); // All Vertex Attributes and Element Buffers will be bound to this VAO
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
-
-	// Buffer Data needs a buffer binding point = GL_ARRAY_BUFFER (or GL_ELEMENT_ARRAY_BUFFER) instead of buffer id
-	glBufferData(GL_ARRAY_BUFFER, triangle.vertexBufferSize() + triangle.indexBufferSize(), 0, GL_STATIC_DRAW);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, triangle.vertexBufferSize(), triangle.vertices);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, triangle.vertexBufferSize(), triangle.vertices);	
 	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, triangle.vertexBufferSize(), triangle.indexBufferSize(), triangle.indices);
-
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0);
-
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), 0);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (char*)(sizeof(float) * 2));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (char*)(sizeof(glm::vec3)));
+	glBindVertexArray(0);
+
+	currentPos += triangle.vertexBufferSize() + triangle.indexBufferSize();
+	glBindVertexArray(shapeVAO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
+	glBufferSubData(GL_ARRAY_BUFFER, currentPos, sizeof(vertices), vertices); // Array Buffer does not care about VAO
+	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, currentPos + sizeof(vertices), sizeof(indices), indices);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (char*)(currentPos)); // Picks up from currently bound ARRAY_BUFFER
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (char*)(currentPos + sizeof(Vec2)));
+	glBindVertexArray(0);
 }
 
 /// <summary>
@@ -62,13 +86,16 @@ void GLWindow::paintGL() {
 	glClearColor(+0.9f, +0.8f, 0.4f, +0.1f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	glBindVertexArray(shapeVAO); // SHAPE
 	// Box
-	/*glUniform3f(colorId, 0.5f, 0.7f, 0.5f);
+	glUniform3f(colorId, 0.5f, 0.7f, 0.5f);
 	glUniform2f(scaleId, 1.0f, 1.0f);
 	glUniform2f(offsetId, 0.0f, 0.0f);
 
-	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_SHORT, (GLvoid*)(sizeof(Vertex) * 7 + sizeof(GLshort)*3));*/
+	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_SHORT, (GLvoid*)(triangle.vertexBufferSize() + triangle.indexBufferSize() + sizeof(Vertex)*4));
+	glBindVertexArray(0);
 
+	glBindVertexArray(triangleVAO); // TRIANGLES
 	// Player 1
 	glUniform3f(colorId, color1.x, color1.y, color1.z);
 	glUniform2f(scaleId, scale1.x, scale1.y);
@@ -80,6 +107,7 @@ void GLWindow::paintGL() {
 	glUniform2f(scaleId, scale2.x, scale2.y);
 	glUniform2f(offsetId, offset2.x, offset2.y);
 	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, (GLvoid*)(triangle.vertexBufferSize()));
+	glBindVertexArray(0);
 
 }
 

@@ -31,5 +31,7 @@ private:
 	unsigned int colorId, scaleId, offsetId;
 
 	Shape triangle;
+
+	GLuint triangleVAO, shapeVAO;
 };
 
