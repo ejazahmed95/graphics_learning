@@ -27,6 +27,8 @@ private:
 
 	Vec3 color1, color2;
 
+	float cubeRotation;
+
 	// Uniforms
 	unsigned int colorId, scaleId, offsetId;
 	unsigned int transformId;

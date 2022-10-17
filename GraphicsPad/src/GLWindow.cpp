@@ -31,6 +31,8 @@ void GLWindow::initData()
 	color1 = { 0.9f, 0.3f, 0.0f };
 	color2 = { 0.0f, 0.3f, 0.9f };
 
+	cubeRotation = 0;
+
 	triangle = ShapeGenerator::Triangle();
 	cube = ShapeGenerator::Cube();
 }
@@ -135,10 +137,10 @@ void GLWindow::paintGL() {
 		using glm::mat4;
 		GLsizeiptr startPos = triangle.fullBufferSize() + sizeof(Vertex) * 4 + sizeof(GLushort) * 4;
 		std::cout << "Cube Drawing Start = " << startPos << std::endl;
-		mat4 translationMat = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, -0.0f));
-		mat4 rotationMat = glm::rotate(mat4(), 0.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-		mat4 projectionMat = glm::perspective(60.0f, ((float)width()) / height(), 0.1f, 10.0f);
-		mat4 transformMat = translationMat * rotationMat;
+		mat4 translationMat = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, -0.5f));
+		mat4 rotationMat = glm::rotate(mat4(), glm::radians(cubeRotation), glm::vec3(1.0f, 0.0f, 0.0f));
+		mat4 projectionMat = glm::perspective(120.0f, ((float)width()) / height(), 0.1f, 10.0f);
+		mat4 transformMat = projectionMat * translationMat * rotationMat;
 
 		glBindVertexArray(cubeVAO); { // Cube
 			glUniformMatrix4fv(transformId, 1, GL_FALSE, &transformMat[0][0]);
@@ -244,12 +246,14 @@ void GLWindow::handleInput(QKeyEvent* event, bool pressed)
 		break;
 	case Qt::Key::Key_Left: // A
 		vel2 = (Vec2{ -speed2, 0.0f }*factor);
+		cubeRotation += 30;
 		break;
 	case Qt::Key::Key_Down: // S
 		vel2 = (Vec2{ 0, -speed2 }*factor);
 		break;
 	case Qt::Key::Key_Right: // D
 		vel2 = (Vec2{ speed2, 0 }*factor);
+		cubeRotation -= 30;
 		break;
 	}
 	//std::cout << "{" << vel1.x << ", " << vel1.y << "}" << std::endl;
