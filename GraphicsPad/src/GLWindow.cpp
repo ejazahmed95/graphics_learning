@@ -5,7 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-//#include <iostream>
+#include <iostream>
 
 void GLWindow::initializeGL() {
 	glewInit();
@@ -80,9 +80,10 @@ void GLWindow::sendData() {
 		currentPos += sizeof(vertices) + sizeof(indices);
 	} glBindVertexArray(0);
 
+	std::cout << "Cube Starting Position = " << currentPos << std::endl;
 	glBindVertexArray(cubeVAO); {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
-		glBufferSubData(GL_ARRAY_BUFFER, currentPos, cube.vertexBufferSize(), cube.indices); // Array Buffer does not care about VAO
+		glBufferSubData(GL_ARRAY_BUFFER, currentPos, cube.vertexBufferSize(), cube.vertices); // Array Buffer does not care about VAO
 		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, currentPos + cube.vertexBufferSize(), cube.indexBufferSize(), cube.indices);
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), 0);
@@ -133,14 +134,15 @@ void GLWindow::paintGL() {
 	glUseProgram(cubeProgram); {
 		using glm::mat4;
 		GLsizeiptr startPos = triangle.fullBufferSize() + sizeof(Vertex) * 4 + sizeof(GLushort) * 4;
-		mat4 translationMat = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, -1.0f));
+		std::cout << "Cube Drawing Start = " << startPos << std::endl;
+		mat4 translationMat = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, -0.0f));
 		mat4 rotationMat = glm::rotate(mat4(), 0.0f, glm::vec3(1.0f, 0.0f, 0.0f));
 		mat4 projectionMat = glm::perspective(60.0f, ((float)width()) / height(), 0.1f, 10.0f);
-		mat4 transformMat = projectionMat * translationMat * rotationMat;
+		mat4 transformMat = translationMat * rotationMat;
 
 		glBindVertexArray(cubeVAO); { // Cube
 			glUniformMatrix4fv(transformId, 1, GL_FALSE, &transformMat[0][0]);
-			glDrawElements(GL_TRIANGLES, cube.numIndices, GL_UNSIGNED_SHORT, (GLvoid*)(startPos + cube.vertexBufferSize()));
+			glDrawElements(GL_TRIANGLES, cube.numIndices, GL_UNSIGNED_SHORT, (GLvoid*)(startPos + cube.vertexBufferSize() + sizeof(GLushort)*0));
 		} glBindVertexArray(0);
 
 	} glUseProgram(0);
