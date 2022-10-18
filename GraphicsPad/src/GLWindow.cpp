@@ -7,8 +7,25 @@
 
 #include <iostream>
 
+glm::vec3 randomPositions[] = {
+	   glm::vec3(3.0f,  0.0f,  -5.0f),
+	   glm::vec3(2.0f,  5.0f, -10.0f),
+	   glm::vec3(-1.5f, -2.2f, -2.5f),
+	   glm::vec3(-3.8f, -2.0f, -8.3f),
+	   glm::vec3(2.4f, -0.4f, -3.5f),
+	   glm::vec3(-1.7f,  3.0f, -7.5f),
+	   glm::vec3(1.3f, -2.0f, -2.5f),
+	   glm::vec3(2.5f,  2.0f, -2.5f),
+	   glm::vec3(1.5f,  0.2f, -1.5f),
+	   glm::vec3(-1.3f,  1.0f, -1.5f),
+
+	   glm::vec3(-2.5f,  1.7f, -1.8f),
+	   glm::vec3(-3.0f,  -1.7f, -0.8f)
+};
+
 void GLWindow::initializeGL() {
 	glewInit();
+	glEnable(GL_DEPTH_TEST);
 	initData();
 	sendData();
 	installShaders();
@@ -58,41 +75,41 @@ void GLWindow::sendData() {
 	glGenVertexArrays(1, &shapeVAO);
 	glGenVertexArrays(1, &cubeVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, bufferID); // Binding the Vertex Buffer (VBO)
-	glBufferData(GL_ARRAY_BUFFER, triangle.fullBufferSize() + sizeof(vertices) + sizeof(indices) + cube.fullBufferSize(), 0, GL_STATIC_DRAW);
-
-	glBindVertexArray(triangleVAO); { // All Vertex Attributes and Element Buffers will be bound to this VAO
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, triangle.vertexBufferSize(), triangle.vertices);
-		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, triangle.vertexBufferSize(), triangle.indexBufferSize(), triangle.indices);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), 0);
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (char*)(sizeof(glm::vec3)));
-		currentPos += triangle.fullBufferSize();
-	} glBindVertexArray(0);
-	
-	glBindVertexArray(shapeVAO); {
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
-		glBufferSubData(GL_ARRAY_BUFFER, currentPos, sizeof(vertices), vertices); // Array Buffer does not care about VAO
-		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, currentPos + sizeof(vertices), sizeof(indices), indices);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (char*)(currentPos)); // Picks up from currently bound ARRAY_BUFFER
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (char*)(currentPos + sizeof(Vec2)));
-		currentPos += sizeof(vertices) + sizeof(indices);
-	} glBindVertexArray(0);
+	glBufferData(GL_ARRAY_BUFFER, triangle.fullBufferSize() + cube.fullBufferSize(), 0, GL_STATIC_DRAW);
 
 	std::cout << "Cube Starting Position = " << currentPos << std::endl;
 	glBindVertexArray(cubeVAO); {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
-		glBufferSubData(GL_ARRAY_BUFFER, currentPos, cube.vertexBufferSize(), cube.vertices); // Array Buffer does not care about VAO
-		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, currentPos + cube.vertexBufferSize(), cube.indexBufferSize(), cube.indices);
+		glBufferSubData(GL_ARRAY_BUFFER, currentPos,									cube.vertexBufferSize(), cube.vertices); // Array Buffer does not care about VAO
+		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, currentPos + cube.vertexBufferSize(),	cube.indexBufferSize(), cube.indices);
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), 0);
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (char*)(sizeof(glm::vec3)));
 		currentPos += cube.fullBufferSize();
 	} glBindVertexArray(0);
+
+	glBindVertexArray(triangleVAO); { // All Vertex Attributes and Element Buffers will be bound to this VAO
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
+		glBufferSubData(GL_ARRAY_BUFFER,			currentPos,									triangle.vertexBufferSize(),	triangle.vertices);
+		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER,	currentPos + triangle.vertexBufferSize(),	triangle.indexBufferSize(),		triangle.indices);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (char*)(cube.fullBufferSize()));
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (char*)(cube.fullBufferSize() + sizeof(glm::vec3)));
+		currentPos += triangle.fullBufferSize();
+	} glBindVertexArray(0);
+
+	//glBindVertexArray(shapeVAO); {
+	//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
+	//	glBufferSubData(GL_ARRAY_BUFFER, currentPos, sizeof(vertices), vertices); // Array Buffer does not care about VAO
+	//	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, currentPos + sizeof(vertices), sizeof(indices), indices);
+	//	glEnableVertexAttribArray(0);
+	//	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (char*)(currentPos)); // Picks up from currently bound ARRAY_BUFFER
+	//	glEnableVertexAttribArray(1);
+	//	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (char*)(currentPos + sizeof(Vec2)));
+	//	currentPos += sizeof(vertices) + sizeof(indices);
+	//} glBindVertexArray(0);
 }
 
 /// <summary>
@@ -104,8 +121,44 @@ void GLWindow::paintGL() {
 
 	//std::cout << "{" << offset1.x  << ", " << offset1.y << "}" << std::endl;
 	glViewport(width() / 4, 0, width() / 2, height());
-	glClearColor(+0.9f, +0.8f, 0.4f, +0.1f);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClearColor(+0.4f, +0.6f, 0.8f, +1.0f);
+	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+	GLsizeiptr startPos = 0;
+
+	glUseProgram(cubeProgram); {
+		using glm::mat4;
+		startPos = 0;
+		std::cout << "Cube Drawing Start = " << startPos << std::endl;
+		mat4 translationMat = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, -3.5f));
+		mat4 rotationMat = glm::rotate(mat4(), glm::radians(cubeRotation), glm::vec3(1.0f, 0.0f, 0.0f));
+		mat4 projectionMat = glm::perspective(60.0f, ((float)width()/2) / height(), 0.1f, 100.0f);
+		mat4 scaleMat = glm::scale(mat4(), glm::vec3(0.5f, 0.5f, 0.5f));
+		mat4 transformMat = projectionMat * translationMat * rotationMat * scaleMat;
+
+		glBindVertexArray(cubeVAO); { // Cube
+			glUniformMatrix4fv(transformId, 1, GL_FALSE, &transformMat[0][0]);
+			glDrawElements(GL_TRIANGLES, cube.numIndices, GL_UNSIGNED_SHORT, (GLvoid*)(startPos + cube.vertexBufferSize()));
+
+			for (unsigned int i = 0; i < 10; i++)
+			{
+				translationMat = glm::translate(mat4(), randomPositions[i]);
+				
+				float angle = 15.0f * i;
+				rotationMat = glm::rotate(mat4(), glm::radians(angle), glm::vec3(1.0f, 0.0f, 0.0f));
+				
+				float scaleFactor = (i + 1) * 0.03f;
+				scaleMat = glm::scale(mat4(), glm::vec3(scaleFactor, scaleFactor, scaleFactor));
+				
+				transformMat = projectionMat * translationMat * rotationMat * scaleMat;
+				glUniformMatrix4fv(transformId, 1, GL_FALSE, &transformMat[0][0]);
+
+				glDrawElements(GL_TRIANGLES, cube.numIndices, GL_UNSIGNED_SHORT, (GLvoid*)(startPos + cube.vertexBufferSize()));
+			}
+
+		} glBindVertexArray(0);
+
+	} glUseProgram(0);
 
 	glUseProgram(triangleProgram); {
 		glBindVertexArray(shapeVAO); { // SHAPE
@@ -114,37 +167,22 @@ void GLWindow::paintGL() {
 			glUniform2f(scaleId, 1.0f, 1.0f);
 			glUniform2f(offsetId, 0.0f, 0.0f);
 
-			glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_SHORT, (GLvoid*)(triangle.vertexBufferSize() + triangle.indexBufferSize() + sizeof(Vertex) * 4));
+			//glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_SHORT, (GLvoid*)(triangle.vertexBufferSize() + triangle.indexBufferSize() + sizeof(Vertex) * 4));
 		} glBindVertexArray(0);
 
 		glBindVertexArray(triangleVAO); { // TRIANGLES
+			startPos = cube.fullBufferSize();
 			// Player 1
 			glUniform3f(colorId, color1.x, color1.y, color1.z);
 			glUniform2f(scaleId, scale1.x, scale1.y);
 			glUniform2f(offsetId, offset1.x, offset1.y);
-			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, (GLvoid*)(triangle.vertexBufferSize()));
+			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, (GLvoid*)(startPos + triangle.vertexBufferSize()));
 
 			// Player 2
 			glUniform3f(colorId, color2.x, color2.y, color2.z);
 			glUniform2f(scaleId, scale2.x, scale2.y);
 			glUniform2f(offsetId, offset2.x, offset2.y);
-			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, (GLvoid*)(triangle.vertexBufferSize()));
-		} glBindVertexArray(0);
-		
-	} glUseProgram(0);
-
-	glUseProgram(cubeProgram); {
-		using glm::mat4;
-		GLsizeiptr startPos = triangle.fullBufferSize() + sizeof(Vertex) * 4 + sizeof(GLushort) * 4;
-		std::cout << "Cube Drawing Start = " << startPos << std::endl;
-		mat4 translationMat = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, -0.5f));
-		mat4 rotationMat = glm::rotate(mat4(), glm::radians(cubeRotation), glm::vec3(1.0f, 0.0f, 0.0f));
-		mat4 projectionMat = glm::perspective(120.0f, ((float)width()) / height(), 0.1f, 10.0f);
-		mat4 transformMat = projectionMat * translationMat * rotationMat;
-
-		glBindVertexArray(cubeVAO); { // Cube
-			glUniformMatrix4fv(transformId, 1, GL_FALSE, &transformMat[0][0]);
-			glDrawElements(GL_TRIANGLES, cube.numIndices, GL_UNSIGNED_SHORT, (GLvoid*)(startPos + cube.vertexBufferSize() + sizeof(GLushort)*0));
+			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, (GLvoid*)(startPos + triangle.vertexBufferSize()));
 		} glBindVertexArray(0);
 
 	} glUseProgram(0);

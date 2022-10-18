@@ -24,5 +24,5 @@ in vec3 vecOutColor;
 
 void main()
 {
-	drawColor = vec4(vecOutColor, 0.5f);
+	drawColor = 1.0f* vec4(vecOutColor, 0.5f);
 };
