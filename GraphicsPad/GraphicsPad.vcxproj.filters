@@ -5,6 +5,7 @@
     <ClCompile Include="src\GLWindow.cpp" />
     <ClCompile Include="src\ShaderLoader.cpp" />
     <ClCompile Include="src\core\ShapeGenerator.cpp" />
+    <ClCompile Include="src\Camera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GLWindow.h" />
@@ -12,10 +13,12 @@
     <ClInclude Include="src\core\Types.h" />
     <ClInclude Include="src\core\ShapeGenerator.h" />
     <ClInclude Include="src\core\Shape.h" />
+    <ClInclude Include="src\Camera.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BasicColorPassing.shader" />
     <None Include="resources\shaders\BasicTransformation.shader" />
     <None Include="resources\shaders\MatTransformation.shader" />
+    <None Include="resources\shaders\BasicLighting.shader" />
   </ItemGroup>
 </Project>

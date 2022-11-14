@@ -3,6 +3,7 @@
 #include<QtOpenGL/qglWidget>
 #include<QtGui/qkeyevent>
 #include<core/Shape.h>
+#include<Camera.h>
 #include<glm/glm.hpp>
 
 class GLWindow : public QGLWidget {
@@ -11,6 +12,7 @@ protected:
 	void paintGL();
 	virtual void keyPressEvent(QKeyEvent*) override; // Function defined in QWidget
 	virtual void keyReleaseEvent(QKeyEvent*) override; // Function defined in QWidget
+	virtual void mouseMoveEvent(QMouseEvent* e) override;
 private:
 	void initData();
 	void sendData();
@@ -18,6 +20,8 @@ private:
 	
 	void handleInput(QKeyEvent* event, bool pressed);
 	Vec2 translatePos(Vec2 initialPos, Vec2 speed, Vec4 bounds);
+
+	Camera camera;
 
 	float deltaTime;
 	float speed1, speed2;
@@ -32,6 +36,7 @@ private:
 	// Uniforms
 	unsigned int colorId, scaleId, offsetId;
 	unsigned int transformId;
+	unsigned int lightPosId;
 
 	Shape triangle, cube;
 

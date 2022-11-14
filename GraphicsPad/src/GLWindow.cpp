@@ -82,10 +82,12 @@ void GLWindow::sendData() {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
 		glBufferSubData(GL_ARRAY_BUFFER, currentPos,									cube.vertexBufferSize(), cube.vertices); // Array Buffer does not care about VAO
 		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, currentPos + cube.vertexBufferSize(),	cube.indexBufferSize(), cube.indices);
-		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(0); // Vertex
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), 0);
-		glEnableVertexAttribArray(1);
+		glEnableVertexAttribArray(1); // Color
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (char*)(sizeof(glm::vec3)));
+		glEnableVertexAttribArray(2); // Normal
+		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (char*)(sizeof(glm::vec3) * 2));
 		currentPos += cube.fullBufferSize();
 	} glBindVertexArray(0);
 
@@ -97,19 +99,11 @@ void GLWindow::sendData() {
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (char*)(cube.fullBufferSize()));
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (char*)(cube.fullBufferSize() + sizeof(glm::vec3)));
+		glEnableVertexAttribArray(2);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (char*)(cube.fullBufferSize() + sizeof(glm::vec3)));
 		currentPos += triangle.fullBufferSize();
 	} glBindVertexArray(0);
 
-	//glBindVertexArray(shapeVAO); {
-	//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
-	//	glBufferSubData(GL_ARRAY_BUFFER, currentPos, sizeof(vertices), vertices); // Array Buffer does not care about VAO
-	//	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, currentPos + sizeof(vertices), sizeof(indices), indices);
-	//	glEnableVertexAttribArray(0);
-	//	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (char*)(currentPos)); // Picks up from currently bound ARRAY_BUFFER
-	//	glEnableVertexAttribArray(1);
-	//	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (char*)(currentPos + sizeof(Vec2)));
-	//	currentPos += sizeof(vertices) + sizeof(indices);
-	//} glBindVertexArray(0);
 }
 
 /// <summary>
@@ -121,10 +115,15 @@ void GLWindow::paintGL() {
 
 	//std::cout << "{" << offset1.x  << ", " << offset1.y << "}" << std::endl;
 	glViewport(width() / 4, 0, width() / 2, height());
-	glClearColor(+0.4f, +0.6f, 0.8f, +1.0f);
+	glClearColor(+0.0f, +0.0f, 0.0f, +1.0f);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 	GLsizeiptr startPos = 0;
+
+
+	glm::mat4 viewToProjectionMat = glm::perspective(60.0f, ((float)width()/2) / height(), 0.1f, 20.0f);
+	glm::mat4 worldToViewMat = camera.getWorldToViewMatrix();
+	glm::mat4 worldToProjectionMat = viewToProjectionMat * worldToViewMat;
 
 	glUseProgram(cubeProgram); {
 		using glm::mat4;
@@ -132,34 +131,22 @@ void GLWindow::paintGL() {
 		std::cout << "Cube Drawing Start = " << startPos << std::endl;
 		mat4 translationMat = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, -3.5f));
 		mat4 rotationMat = glm::rotate(mat4(), glm::radians(cubeRotation), glm::vec3(1.0f, 0.0f, 0.0f));
-		mat4 projectionMat = glm::perspective(60.0f, ((float)width()/2) / height(), 0.1f, 100.0f);
 		mat4 scaleMat = glm::scale(mat4(), glm::vec3(0.5f, 0.5f, 0.5f));
-		mat4 transformMat = projectionMat * translationMat * rotationMat * scaleMat;
+		mat4 modelToWorldMat = translationMat * rotationMat * scaleMat;
+
+		mat4 modelToProjection = worldToProjectionMat * modelToWorldMat;
 
 		glBindVertexArray(cubeVAO); { // Cube
-			glUniformMatrix4fv(transformId, 1, GL_FALSE, &transformMat[0][0]);
+			glUniformMatrix4fv(transformId, 1, GL_FALSE, &modelToProjection[0][0]);
+			glm::vec3 lightPosition = glm::vec3(0.0f, 3.0f, 0.0f);
+			glUniform3fv(lightPosId, 1, &lightPosition[0]);
 			glDrawElements(GL_TRIANGLES, cube.numIndices, GL_UNSIGNED_SHORT, (GLvoid*)(startPos + cube.vertexBufferSize()));
-
-			for (unsigned int i = 0; i < 10; i++)
-			{
-				translationMat = glm::translate(mat4(), randomPositions[i]);
-				
-				float angle = 15.0f * i;
-				rotationMat = glm::rotate(mat4(), glm::radians(angle), glm::vec3(1.0f, 0.0f, 0.0f));
-				
-				float scaleFactor = (i + 1) * 0.03f;
-				scaleMat = glm::scale(mat4(), glm::vec3(scaleFactor, scaleFactor, scaleFactor));
-				
-				transformMat = projectionMat * translationMat * rotationMat * scaleMat;
-				glUniformMatrix4fv(transformId, 1, GL_FALSE, &transformMat[0][0]);
-
-				glDrawElements(GL_TRIANGLES, cube.numIndices, GL_UNSIGNED_SHORT, (GLvoid*)(startPos + cube.vertexBufferSize()));
-			}
 
 		} glBindVertexArray(0);
 
 	} glUseProgram(0);
 
+	/*
 	glUseProgram(triangleProgram); {
 		glBindVertexArray(shapeVAO); { // SHAPE
 			// Box
@@ -186,7 +173,7 @@ void GLWindow::paintGL() {
 		} glBindVertexArray(0);
 
 	} glUseProgram(0);
-
+	*/
 }
 
 
@@ -221,7 +208,7 @@ void GLWindow::installShaders() {
 	vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
 	fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 
-	source = GetShaderSource("resources/shaders/MatTransformation.shader");
+	source = GetShaderSource("resources/shaders/BasicLighting.shader");
 	adapter[0] = source.VertexSource.c_str();
 	glShaderSource(vertexShaderID, 1, adapter, 0);
 	adapter[0] = source.FragmentSource.c_str();
@@ -236,6 +223,7 @@ void GLWindow::installShaders() {
 	glLinkProgram(cubeProgram);
 
 	transformId = glGetUniformLocation(cubeProgram, "transformMat");
+	lightPosId = glGetUniformLocation(cubeProgram, "lightPos");
 }
 
 Vec2 GLWindow::translatePos(Vec2 initialPos, Vec2 speed, Vec4 bounds)
@@ -259,6 +247,12 @@ void GLWindow::keyPressEvent(QKeyEvent* event) {
 
 void GLWindow::keyReleaseEvent(QKeyEvent* event) {
 	handleInput(event, false);
+}
+
+void GLWindow::mouseMoveEvent(QMouseEvent* e)
+{
+	camera.mouseUpdate(glm::vec2(e->x(), e->y()));
+	repaint();
 }
 
 void GLWindow::handleInput(QKeyEvent* event, bool pressed)

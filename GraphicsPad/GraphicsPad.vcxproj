@@ -146,12 +146,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\core\ShapeGenerator.cpp" />
     <ClCompile Include="src\GLWindow.cpp" />
     <ClCompile Include="Mainer.cpp" />
     <ClCompile Include="src\ShaderLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\core\Shape.h" />
     <ClInclude Include="src\core\ShapeGenerator.h" />
     <ClInclude Include="src\GLWindow.h" />
@@ -161,6 +163,7 @@
   <ItemGroup>
     <None Include="resources\shaders\BasicColorPassing.shader" />
     <None Include="resources\shaders\BasicTransformation.shader" />
+    <None Include="resources\shaders\BasicLighting.shader" />
     <None Include="resources\shaders\MatTransformation.shader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -32,60 +32,130 @@ Shape ShapeGenerator::Cube() {
 	Shape cube;
 	using glm::vec3;
 	Vertex3D vertices[] = {
-		vec3(-1.0f, +1.0f, +1.0f), // 0
-		vec3(+1.0f, +0.0f, +0.0f), // Color
-		vec3(+1.0f, +1.0f, +1.0f), // 1
-		vec3(+0.0f, +1.0f, +0.0f), // Color
-		vec3(+1.0f, +1.0f, -1.0f), // 2
-		vec3(+0.0f, +0.0f, +1.0f), // Color
-		vec3(-1.0f, +1.0f, -1.0f), // 3
-		vec3(+1.0f, +1.0f, +1.0f), // Color
+		vec3(-1.0f, +1.0f, +1.0f),  // 0
+		vec3(+1.0f, +0.0f, +0.0f),	// Color
+		vec3(+0.0f, +1.0f, +0.0f),  // Normal
+		vec3(+1.0f, +1.0f, +1.0f),  // 1
+		vec3(+0.0f, +1.0f, +0.0f),	// Color
+		vec3(+0.0f, +1.0f, +0.0f),  // Normal
+		vec3(+1.0f, +1.0f, -1.0f),  // 2
+		vec3(+0.0f, +0.0f, +1.0f),  // Color
+		vec3(+0.0f, +1.0f, +0.0f),  // Normal
+		vec3(-1.0f, +1.0f, -1.0f),  // 3
+		vec3(+1.0f, +1.0f, +1.0f),  // Color
+		vec3(+0.0f, +1.0f, +0.0f),  // Normal
 
-		vec3(-1.0f, +1.0f, -1.0f), // 4
-		vec3(+1.0f, +0.0f, +1.0f), // Color
-		vec3(+1.0f, +1.0f, -1.0f), // 5
-		vec3(+0.0f, +0.5f, +0.2f), // Color
-		vec3(+1.0f, -1.0f, -1.0f), // 6
-		vec3(+0.8f, +0.6f, +0.4f), // Color
-		vec3(-1.0f, -1.0f, -1.0f), // 7
-		vec3(+0.3f, +1.0f, +0.5f), // Color
+		vec3(-1.0f, +1.0f, -1.0f),  // 4
+		vec3(+1.0f, +0.0f, +1.0f),  // Color
+		vec3(+0.0f, +0.0f, -1.0f),  // Normal
+		vec3(+1.0f, +1.0f, -1.0f),  // 5
+		vec3(+0.0f, +0.5f, +0.2f),  // Color
+		vec3(+0.0f, +0.0f, -1.0f),  // Normal
+		vec3(+1.0f, -1.0f, -1.0f),  // 6
+		vec3(+0.8f, +0.6f, +0.4f),  // Color
+		vec3(+0.0f, +0.0f, -1.0f),  // Normal
+		vec3(-1.0f, -1.0f, -1.0f),  // 7
+		vec3(+0.3f, +1.0f, +0.5f),  // Color
+		vec3(+0.0f, +0.0f, -1.0f),  // Normal
 
-		vec3(+1.0f, +1.0f, -1.0f), // 8
-		vec3(+0.2f, +0.5f, +0.2f), // Color
-		vec3(+1.0f, +1.0f, +1.0f), // 9
-		vec3(+0.9f, +0.3f, +0.7f), // Color
-		vec3(+1.0f, -1.0f, +1.0f), // 10
-		vec3(+0.3f, +0.7f, +0.5f), // Color
-		vec3(+1.0f, -1.0f, -1.0f), // 11
-		vec3(+0.5f, +0.7f, +0.5f), // Color
+		vec3(+1.0f, +1.0f, -1.0f),  // 8
+		vec3(+0.2f, +0.5f, +0.2f),  // Color
+		vec3(+1.0f, +0.0f, +0.0f),  // Normal
+		vec3(+1.0f, +1.0f, +1.0f),  // 9
+		vec3(+0.9f, +0.3f, +0.7f),  // Color
+		vec3(+1.0f, +0.0f, +0.0f),  // Normal
+		vec3(+1.0f, -1.0f, +1.0f),  // 10
+		vec3(+0.3f, +0.7f, +0.5f),  // Color
+		vec3(+1.0f, +0.0f, +0.0f),  // Normal
+		vec3(+1.0f, -1.0f, -1.0f),  // 11
+		vec3(+0.5f, +0.7f, +0.5f),  // Color
+		vec3(+1.0f, +0.0f, +0.0f),  // Normal
 
-		vec3(-1.0f, +1.0f, +1.0f), // 12
-		vec3(+0.7f, +0.8f, +0.2f), // Color
-		vec3(-1.0f, +1.0f, -1.0f), // 13
-		vec3(+0.5f, +0.7f, +0.3f), // Color
-		vec3(-1.0f, -1.0f, -1.0f), // 14
-		vec3(+0.4f, +0.7f, +0.7f), // Color
-		vec3(-1.0f, -1.0f, +1.0f), // 15
-		vec3(+0.2f, +0.5f, +1.0f), // Color
+		vec3(-1.0f, +1.0f, +1.0f),  // 12
+		vec3(+0.7f, +0.8f, +0.2f),  // Color
+		vec3(-1.0f, +0.0f, +0.0f),  // Normal
+		vec3(-1.0f, +1.0f, -1.0f),  // 13
+		vec3(+0.5f, +0.7f, +0.3f),  // Color
+		vec3(-1.0f, +0.0f, +0.0f),  // Normal
+		vec3(-1.0f, -1.0f, -1.0f),  // 14
+		vec3(+0.4f, +0.7f, +0.7f),  // Color
+		vec3(-1.0f, +0.0f, +0.0f),  // Normal
+		vec3(-1.0f, -1.0f, +1.0f),  // 15
+		vec3(+0.2f, +0.5f, +1.0f),  // Color
+		vec3(-1.0f, +0.0f, +0.0f),  // Normal
 
-		vec3(+1.0f, +1.0f, +1.0f), // 16
-		vec3(+0.6f, +1.0f, +0.7f), // Color
-		vec3(-1.0f, +1.0f, +1.0f), // 17
-		vec3(+0.6f, +0.4f, +0.8f), // Color
-		vec3(-1.0f, -1.0f, +1.0f), // 18
-		vec3(+0.2f, +0.8f, +0.7f), // Color
-		vec3(+1.0f, -1.0f, +1.0f), // 19
-		vec3(+0.2f, +0.7f, +1.0f), // Color
+		vec3(+1.0f, +1.0f, +1.0f),  // 16
+		vec3(+0.6f, +1.0f, +0.7f),  // Color
+		vec3(+0.0f, +0.0f, +1.0f),  // Normal
+		vec3(-1.0f, +1.0f, +1.0f),  // 17
+		vec3(+0.6f, +0.4f, +0.8f),  // Color
+		vec3(+0.0f, +0.0f, +1.0f),  // Normal
+		vec3(-1.0f, -1.0f, +1.0f),  // 18
+		vec3(+0.2f, +0.8f, +0.7f),  // Color
+		vec3(+0.0f, +0.0f, +1.0f),  // Normal
+		vec3(+1.0f, -1.0f, +1.0f),  // 19
+		vec3(+0.2f, +0.7f, +1.0f),  // Color
+		vec3(+0.0f, +0.0f, +1.0f),  // Normal
 
-		vec3(+1.0f, -1.0f, -1.0f), // 20
-		vec3(+0.8f, +0.3f, +0.7f), // Color
-		vec3(-1.0f, -1.0f, -1.0f), // 21
-		vec3(+0.8f, +0.9f, +0.5f), // Color
-		vec3(-1.0f, -1.0f, +1.0f), // 22
-		vec3(+0.5f, +0.8f, +0.5f), // Color
-		vec3(+1.0f, -1.0f, +1.0f), // 23
-		vec3(+0.9f, +1.0f, +0.2f), // Color
+		vec3(+1.0f, -1.0f, -1.0f),  // 20
+		vec3(+0.8f, +0.3f, +0.7f),  // Color
+		vec3(+0.0f, -1.0f, +0.0f),  // Normal
+		vec3(-1.0f, -1.0f, -1.0f),  // 21
+		vec3(+0.8f, +0.9f, +0.5f),  // Color
+		vec3(+0.0f, -1.0f, +0.0f),  // Normal
+		vec3(-1.0f, -1.0f, +1.0f),  // 22
+		vec3(+0.5f, +0.8f, +0.5f),  // Color
+		vec3(+0.0f, -1.0f, +0.0f),  // Normal
+		vec3(+1.0f, -1.0f, +1.0f),  // 23
+		vec3(+0.9f, +1.0f, +0.2f),  // Color
+		vec3(+0.0f, -1.0f, +0.0f),  // Normal
 	};
+	/* OpenGL Vertices
+	Vertex3D vertices[] = {
+		vec3(-0.5f, -0.5f, -0.5f),  vec3(0.0f,  0.0f, -1.0f),
+		vec3(0.5f, -0.5f, -0.5f),  vec3(0.0f,  0.0f, -1.0f),
+		vec3(0.5f,  0.5f, -0.5f),  vec3(0.0f,  0.0f, -1.0f),
+		vec3(0.5f,  0.5f, -0.5f),  vec3(0.0f,  0.0f, -1.0f),
+		vec3(-0.5f,  0.5f, -0.5f),  vec3(0.0f,  0.0f, -1.0f),
+		vec3(-0.5f, -0.5f, -0.5f),  vec3(0.0f,  0.0f, -1.0f),
+
+		vec3(-0.5f, -0.5f,  0.5f),  vec3(0.0f,  0.0f, 1.0f),
+		vec3(0.5f, -0.5f,  0.5f),  vec3(0.0f,  0.0f, 1.0f),
+		vec3(0.5f,  0.5f,  0.5f),  vec3(0.0f,  0.0f, 1.0f),
+		vec3(0.5f,  0.5f,  0.5f),  vec3(0.0f,  0.0f, 1.0f),
+		vec3(-0.5f,  0.5f,  0.5f),  vec3(0.0f,  0.0f, 1.0f),
+		vec3(-0.5f, -0.5f,  0.5f),  vec3(0.0f,  0.0f, 1.0f),
+
+		vec3(-0.5f,  0.5f,  0.5f), vec3(-1.0f,  0.0f,  0.0f),
+		vec3(-0.5f,  0.5f, -0.5f), vec3(-1.0f,  0.0f,  0.0f),
+		vec3(-0.5f, -0.5f, -0.5f), vec3(-1.0f,  0.0f,  0.0f),
+		vec3(-0.5f, -0.5f, -0.5f), vec3(-1.0f,  0.0f,  0.0f),
+		vec3(-0.5f, -0.5f,  0.5f), vec3(-1.0f,  0.0f,  0.0f),
+		vec3(-0.5f,  0.5f,  0.5f), vec3(-1.0f,  0.0f,  0.0f),
+
+		vec3(0.5f,  0.5f,  0.5f),  vec3(1.0f,  0.0f,  0.0f),
+		vec3(0.5f,  0.5f, -0.5f),  vec3(1.0f,  0.0f,  0.0f),
+		vec3(0.5f, -0.5f, -0.5f),  vec3(1.0f,  0.0f,  0.0f),
+		vec3(0.5f, -0.5f, -0.5f),  vec3(1.0f,  0.0f,  0.0f),
+		vec3(0.5f, -0.5f,  0.5f),  vec3(1.0f,  0.0f,  0.0f),
+		vec3(0.5f,  0.5f,  0.5f),  vec3(1.0f,  0.0f,  0.0f),
+
+		vec3(-0.5f, -0.5f, -0.5f),  vec3(0.0f, -1.0f,  0.0f),
+		vec3(0.5f, -0.5f, -0.5f),  vec3(0.0f, -1.0f,  0.0f),
+		vec3(0.5f, -0.5f,  0.5f),  vec3(0.0f, -1.0f,  0.0f),
+		vec3(0.5f, -0.5f,  0.5f),  vec3(0.0f, -1.0f,  0.0f),
+		vec3(-0.5f, -0.5f,  0.5f),  vec3(0.0f, -1.0f,  0.0f),
+		vec3(-0.5f, -0.5f, -0.5f),  vec3(0.0f, -1.0f,  0.0f),
+
+		vec3(-0.5f,  0.5f, -0.5f),  vec3(0.0f,  1.0f,  0.0f),
+		vec3(0.5f,  0.5f, -0.5f),  vec3(0.0f,  1.0f,  0.0f),
+		vec3(0.5f,  0.5f,  0.5f),  vec3(0.0f,  1.0f,  0.0f),
+		vec3(0.5f,  0.5f,  0.5f),  vec3(0.0f,  1.0f,  0.0f),
+		vec3(-0.5f,  0.5f,  0.5f),  vec3(0.0f,  1.0f,  0.0f),
+		vec3(-0.5f,  0.5f, -0.5f),  vec3(0.0f,  1.0f,  0.0f)
+	};
+	*/
+
 	cube.numVertices = NUM_ARRAY_ELEMENTS(vertices);
 	cube.vertices = new Vertex3D[cube.numVertices];
 	memcpy(cube.vertices, vertices, sizeof(vertices));
