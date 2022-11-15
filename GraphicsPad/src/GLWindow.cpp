@@ -51,7 +51,7 @@ void GLWindow::initData()
 	cubeRotation = 0;
 
 	triangle = ShapeGenerator::Triangle();
-	cube = ShapeGenerator::Cube();
+	cube = ShapeGenerator::Plane();
 }
 
 void GLWindow::sendData() {
@@ -77,7 +77,6 @@ void GLWindow::sendData() {
 	glBindBuffer(GL_ARRAY_BUFFER, bufferID); // Binding the Vertex Buffer (VBO)
 	glBufferData(GL_ARRAY_BUFFER, cube.fullBufferSize(), 0, GL_STATIC_DRAW);
 
-	std::cout << "Cube Starting Position = " << currentPos << std::endl;
 	glBindVertexArray(cubeVAO); {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
 		glBufferSubData(GL_ARRAY_BUFFER, currentPos,									cube.vertexBufferSize(), cube.vertices); // Array Buffer does not care about VAO
@@ -122,26 +121,32 @@ void GLWindow::paintGL() {
 	GLsizeiptr startPos = 0;
 
 
-	glm::mat4 viewToProjectionMat = glm::perspective(60.0f, ((float)width()/2) / height(), 0.1f, 20.0f);
+	glm::mat4 viewToProjectionMat = glm::perspective(60.0f, ((float)width()) / height(), 0.1f, 20.0f);
 	glm::mat4 worldToViewMat = camera.getWorldToViewMatrix();
 	glm::mat4 worldToProjectionMat = viewToProjectionMat * worldToViewMat;
 
 	glUseProgram(cubeProgram); {
 		using glm::mat4;
 		startPos = 0;
-		std::cout << "Cube Drawing Start = " << startPos << std::endl;
-		mat4 translationMat = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, -3.0f));
-		mat4 rotationMat = glm::rotate(mat4(), glm::radians(cubeRotation), glm::vec3(1.0f, 0.0f, 0.0f));
+		//std::cout << "Cube Drawing Start = " << startPos << std::endl;
+		mat4 translationMat = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, 0.0f));
+		//mat4 rotationMat = glm::rotate(mat4(), glm::radians(cubeRotation), glm::vec3(1.0f, 1.0f, 0.0f));
 		mat4 scaleMat = glm::scale(mat4(), glm::vec3(0.5f, 0.5f, 0.5f));
-		mat4 modelToWorldMat = translationMat * rotationMat * scaleMat;
+		mat4 modelToWorldMat = translationMat * scaleMat;
 
 		mat4 modelToProjection = worldToProjectionMat * modelToWorldMat;
+		mat4 modelToViewMat = worldToViewMat * modelToWorldMat;
 
 		glBindVertexArray(cubeVAO); { // Cube
 			glUniformMatrix4fv(transformId, 1, GL_FALSE, &modelToProjection[0][0]);
-			glUniformMatrix4fv(modelToWorldId, 1, GL_FALSE, &modelToWorldMat[0][0]);
-			glm::vec3 lightPosition = glm::vec3(0.0f, 0.0f, 3.0f);
+			glUniformMatrix4fv(modelToWorldId, 1, GL_FALSE, &modelToViewMat[0][0]);
+			glUniformMatrix4fv(modelToViewId, 1, GL_FALSE, &modelToWorldMat[0][0]);
+			glm::vec3 lightPosition = glm::vec3(0.0f, 3.0f, 0.0f);
 			glUniform3fv(lightPosId, 1, &lightPosition[0]);
+			glm::vec3 viewPosition = camera.getPosition();
+			std::cout << "ViewPos::" << viewPosition.r << viewPosition.g << viewPosition.b << std::endl;
+
+			glUniform3fv(viewPosId, 1, &viewPosition[0]);
 			glDrawElements(GL_TRIANGLES, cube.numIndices, GL_UNSIGNED_SHORT, (GLvoid*)(startPos + cube.vertexBufferSize()));
 
 		} glBindVertexArray(0);
@@ -226,7 +231,9 @@ void GLWindow::installShaders() {
 
 	transformId = glGetUniformLocation(cubeProgram, "transformMat");
 	modelToWorldId = glGetUniformLocation(cubeProgram, "modelToWorldMat");
+	modelToViewId = glGetUniformLocation(cubeProgram, "modelToViewMat");
 	lightPosId = glGetUniformLocation(cubeProgram, "lightPos");
+	viewPosId = glGetUniformLocation(cubeProgram, "viewPos");
 }
 
 Vec2 GLWindow::translatePos(Vec2 initialPos, Vec2 speed, Vec4 bounds)
@@ -266,15 +273,25 @@ void GLWindow::handleInput(QKeyEvent* event, bool pressed)
 	switch (event->key()) {
 	case Qt::Key::Key_W: // W
 		vel1 = (Vec2{ 0, speed1 }*factor);
+		camera.moveForward();
 		break;
 	case 0x0041: // A
 		vel1 = (Vec2{ -speed1, 0.0f }*factor);
+		camera.strafeLeft();
 		break;
 	case 0x0053: // S
 		vel1 = (Vec2{ 0, -speed1 }*factor);
+		camera.moveBackward();
 		break;
 	case 0x0044: // D
 		vel1 = (Vec2{ speed2, 0 }*factor);
+		camera.strafeRight();
+		break;
+	case Qt::Key::Key_Q:
+		camera.moveDown();
+		break;
+	case Qt::Key::Key_E:
+		camera.moveUp();
 		break;
 	case Qt::Key::Key_Up: // W
 		vel2 = (Vec2{ 0, speed2 }*factor);
@@ -291,6 +308,7 @@ void GLWindow::handleInput(QKeyEvent* event, bool pressed)
 		cubeRotation -= 30;
 		break;
 	}
+	std::cout << "Cube Rotation" << cubeRotation << std::endl;
 	//std::cout << "{" << vel1.x << ", " << vel1.y << "}" << std::endl;
 	repaint();
 }
