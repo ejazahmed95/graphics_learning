@@ -75,7 +75,7 @@ void GLWindow::sendData() {
 	glGenVertexArrays(1, &shapeVAO);
 	glGenVertexArrays(1, &cubeVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, bufferID); // Binding the Vertex Buffer (VBO)
-	glBufferData(GL_ARRAY_BUFFER, triangle.fullBufferSize() + cube.fullBufferSize(), 0, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, cube.fullBufferSize(), 0, GL_STATIC_DRAW);
 
 	std::cout << "Cube Starting Position = " << currentPos << std::endl;
 	glBindVertexArray(cubeVAO); {
@@ -91,6 +91,7 @@ void GLWindow::sendData() {
 		currentPos += cube.fullBufferSize();
 	} glBindVertexArray(0);
 
+	/*
 	glBindVertexArray(triangleVAO); { // All Vertex Attributes and Element Buffers will be bound to this VAO
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
 		glBufferSubData(GL_ARRAY_BUFFER,			currentPos,									triangle.vertexBufferSize(),	triangle.vertices);
@@ -102,7 +103,7 @@ void GLWindow::sendData() {
 		glEnableVertexAttribArray(2);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (char*)(cube.fullBufferSize() + sizeof(glm::vec3)));
 		currentPos += triangle.fullBufferSize();
-	} glBindVertexArray(0);
+	} glBindVertexArray(0);*/
 
 }
 
@@ -129,7 +130,7 @@ void GLWindow::paintGL() {
 		using glm::mat4;
 		startPos = 0;
 		std::cout << "Cube Drawing Start = " << startPos << std::endl;
-		mat4 translationMat = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, -3.5f));
+		mat4 translationMat = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, -3.0f));
 		mat4 rotationMat = glm::rotate(mat4(), glm::radians(cubeRotation), glm::vec3(1.0f, 0.0f, 0.0f));
 		mat4 scaleMat = glm::scale(mat4(), glm::vec3(0.5f, 0.5f, 0.5f));
 		mat4 modelToWorldMat = translationMat * rotationMat * scaleMat;
@@ -138,7 +139,8 @@ void GLWindow::paintGL() {
 
 		glBindVertexArray(cubeVAO); { // Cube
 			glUniformMatrix4fv(transformId, 1, GL_FALSE, &modelToProjection[0][0]);
-			glm::vec3 lightPosition = glm::vec3(0.0f, 3.0f, 0.0f);
+			glUniformMatrix4fv(modelToWorldId, 1, GL_FALSE, &modelToWorldMat[0][0]);
+			glm::vec3 lightPosition = glm::vec3(0.0f, 0.0f, 3.0f);
 			glUniform3fv(lightPosId, 1, &lightPosition[0]);
 			glDrawElements(GL_TRIANGLES, cube.numIndices, GL_UNSIGNED_SHORT, (GLvoid*)(startPos + cube.vertexBufferSize()));
 
@@ -223,6 +225,7 @@ void GLWindow::installShaders() {
 	glLinkProgram(cubeProgram);
 
 	transformId = glGetUniformLocation(cubeProgram, "transformMat");
+	modelToWorldId = glGetUniformLocation(cubeProgram, "modelToWorldMat");
 	lightPosId = glGetUniformLocation(cubeProgram, "lightPos");
 }
 

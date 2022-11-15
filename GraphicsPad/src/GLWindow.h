@@ -35,7 +35,7 @@ private:
 
 	// Uniforms
 	unsigned int colorId, scaleId, offsetId;
-	unsigned int transformId;
+	unsigned int transformId, modelToWorldId;
 	unsigned int lightPosId;
 
 	Shape triangle, cube;
