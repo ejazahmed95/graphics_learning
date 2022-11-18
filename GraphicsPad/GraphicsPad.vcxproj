@@ -156,6 +156,7 @@
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\core\Shape.h" />
     <ClInclude Include="src\core\ShapeGenerator.h" />
+    <ClInclude Include="src\core\Teapot.h" />
     <ClInclude Include="src\GLWindow.h" />
     <ClInclude Include="src\ShaderLoader.h" />
     <ClInclude Include="src\core\Types.h" />

@@ -3,6 +3,7 @@
 #include "ShaderLoader.h"
 #include <core/ShapeGenerator.h>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
@@ -121,7 +122,7 @@ void GLWindow::paintGL() {
 	GLsizeiptr startPos = 0;
 
 
-	glm::mat4 viewToProjectionMat = glm::perspective(60.0f, ((float)width()) / height(), 0.1f, 20.0f);
+	glm::mat4 viewToProjectionMat = glm::perspective(70.0f, ((float)width()) / height(), 0.1f, 20.0f);
 	glm::mat4 worldToViewMat = camera.getWorldToViewMatrix();
 	glm::mat4 worldToProjectionMat = viewToProjectionMat * worldToViewMat;
 
@@ -129,18 +130,18 @@ void GLWindow::paintGL() {
 		using glm::mat4;
 		startPos = 0;
 		//std::cout << "Cube Drawing Start = " << startPos << std::endl;
-		mat4 translationMat = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, 0.0f));
-		//mat4 rotationMat = glm::rotate(mat4(), glm::radians(cubeRotation), glm::vec3(1.0f, 1.0f, 0.0f));
-		mat4 scaleMat = glm::scale(mat4(), glm::vec3(0.5f, 0.5f, 0.5f));
-		mat4 modelToWorldMat = translationMat * scaleMat;
-
+		mat4 translationMat = glm::translate(mat4(), glm::vec3(0.0f, -1.0f, -3.0f));
+		mat4 rotationMat = glm::rotate(cubeRotation, glm::vec3(1.0f, 0.0f, 0.0f));
+		mat4 scaleMat = glm::scale(mat4(), glm::vec3(1.0f, 1.0f, 1.0f));
+		
+		mat4 modelToWorldMat = translationMat * rotationMat * scaleMat;
+		
+		// Render the vertices in Camera's view
 		mat4 modelToProjection = worldToProjectionMat * modelToWorldMat;
-		mat4 modelToViewMat = worldToViewMat * modelToWorldMat;
 
 		glBindVertexArray(cubeVAO); { // Cube
 			glUniformMatrix4fv(transformId, 1, GL_FALSE, &modelToProjection[0][0]);
-			glUniformMatrix4fv(modelToWorldId, 1, GL_FALSE, &modelToViewMat[0][0]);
-			glUniformMatrix4fv(modelToViewId, 1, GL_FALSE, &modelToWorldMat[0][0]);
+			glUniformMatrix4fv(modelToWorldId, 1, GL_FALSE, &modelToWorldMat[0][0]);
 			glm::vec3 lightPosition = glm::vec3(0.0f, 3.0f, 0.0f);
 			glUniform3fv(lightPosId, 1, &lightPosition[0]);
 			glm::vec3 viewPosition = camera.getPosition();
@@ -215,14 +216,17 @@ void GLWindow::installShaders() {
 	vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
 	fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 
-	source = GetShaderSource("resources/shaders/BasicLighting.shader");
+	source = GetShaderSource("resources/shaders/MatTransformation.shader");
 	adapter[0] = source.VertexSource.c_str();
 	glShaderSource(vertexShaderID, 1, adapter, 0);
 	adapter[0] = source.FragmentSource.c_str();
 	glShaderSource(fragmentShaderID, 1, adapter, 0);
 
+	// Compile Shader
 	glCompileShader(vertexShaderID);
 	glCompileShader(fragmentShaderID);
+
+	// Attach shader to a program id; Link Program
 
 	cubeProgram = glCreateProgram();
 	glAttachShader(cubeProgram, vertexShaderID);
@@ -275,7 +279,7 @@ void GLWindow::handleInput(QKeyEvent* event, bool pressed)
 		vel1 = (Vec2{ 0, speed1 }*factor);
 		camera.moveForward();
 		break;
-	case 0x0041: // A
+	case Qt::Key::Key_A: // A
 		vel1 = (Vec2{ -speed1, 0.0f }*factor);
 		camera.strafeLeft();
 		break;
@@ -283,7 +287,7 @@ void GLWindow::handleInput(QKeyEvent* event, bool pressed)
 		vel1 = (Vec2{ 0, -speed1 }*factor);
 		camera.moveBackward();
 		break;
-	case 0x0044: // D
+	case Qt::Key::Key_D: // D
 		vel1 = (Vec2{ speed2, 0 }*factor);
 		camera.strafeRight();
 		break;

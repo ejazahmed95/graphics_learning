@@ -11,11 +11,13 @@ public:
 	static Shape Arrow();
 	static Shape Plane(uint dimensions = 10);
 	static Shape Teapot(uint tesselation = 10, const glm::mat4& lidTransform = glm::mat4());
+	static Shape Sphere(uint tesselation = 20);
 	static Shape GenerateNormals(const Shape& data);
-
+	static Shape Torus(uint tesselation = 20);
 private:
 	static Shape MakePlaneVertices(uint dimensions);
 	static Shape MakePlaneIndices(uint dimensions);
+	static Shape MakePlaneUnseamedIndices(uint tesselation);
 
 	// Teapot helpers
 	static void GeneratePatches(float* v, float* n, float* tc, unsigned short* el, int grid);
