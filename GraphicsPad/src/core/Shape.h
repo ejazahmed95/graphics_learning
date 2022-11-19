@@ -26,6 +26,16 @@ struct Shape {
 		return vertexBufferSize() + indexBufferSize();
 	}
 
+	// Set this when using a single buffer to get the indices offset
+	GLuint bufferOffset;
+	GLsizeiptr verticesOffset() const {
+		return bufferOffset;
+	}
+
+	GLsizeiptr indicesOffset() const {
+		return bufferOffset + vertexBufferSize();
+	}
+
 	void cleanup() {
 		delete[] vertices;
 		delete[] indices;

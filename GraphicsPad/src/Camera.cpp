@@ -8,6 +8,7 @@ Camera::Camera() :
 	viewDirection(0.0f, 0.0f, -1.0f),
 	UP(0.0f, 1.0f, 0.0f)
 {
+	strafeDirection = glm::cross(viewDirection, UP);
 }
 
 void Camera::mouseUpdate(const glm::vec2& newMousePosition)

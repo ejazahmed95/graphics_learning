@@ -23,4 +23,7 @@ public:
 	void moveDown();
 
 	glm::vec3 getPosition() const { return position; }
+	glm::vec3 getViewDirection() const { return viewDirection; }
+	glm::vec3 getStrafeDirection() const { return strafeDirection; }
+	glm::vec3 getUp() const { return UP; }
 };

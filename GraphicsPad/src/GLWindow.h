@@ -18,13 +18,14 @@ private:
 	void sendData();
 	void installShaders();
 	
+	void setShapeData(const Shape& shape);
 	void handleInput(QKeyEvent* event, bool pressed);
 	Vec2 translatePos(Vec2 initialPos, Vec2 speed, Vec4 bounds);
 
 	Camera camera;
 
 	float deltaTime;
-	float speed1, speed2;
+	float lightMoveSpeed, speed2;
 	Vec2 vel1, vel2;
 	Vec2 offset1, offset2;
 	Vec2 scale1, scale2;
@@ -35,13 +36,15 @@ private:
 
 	// Uniforms
 	unsigned int colorId, scaleId, offsetId;
-	unsigned int transformId, modelToWorldId, modelToViewId;
-	unsigned int lightPosId, viewPosId;
+	unsigned int modelToProjectionId, modelToWorldId, modelToViewId;
+	unsigned int lightPosId, lightColorId, viewPosId;
 
-	Shape triangle, cube;
+	Shape plane, cube, sphere;
+	GLuint planeVAO, cubeVAO, sphereVAO;
 
-	GLuint cubeVAO, triangleVAO, shapeVAO;
+	glm::vec3 lightPosition;
 	
-	GLuint triangleProgram, cubeProgram;
+	GLuint lightingProgram, passthroughProgram;
 };
 
+std::string ToString(glm::vec3& v);

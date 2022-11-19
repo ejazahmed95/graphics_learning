@@ -5,9 +5,8 @@ in layout(location = 0) vec3 position;
 in layout(location = 1) vec3 vertexColor;
 in layout(location = 2) vec3 normal;
 
-uniform mat4 transformMat;
+uniform mat4 transformMat; // Model To Projection Mat
 uniform mat4 modelToWorldMat;
-uniform mat4 modelToViewMat;
 
 // Interpolated Values outputted by vertex shader
 out vec3 fragPosition;
@@ -20,18 +19,20 @@ void main()
 	gl_Position = transformMat * pos;
 
 	fragPosition = vec3(modelToWorldMat * vec4(position, 0));
-	fragColor = vec3(1.0, 1.0, 1.0);
-	vecOutNormal = vec3(modelToWorldMat * vec4(normal, 0));
+	fragColor = vec3(1.0, 1.0, 1.0); // Reset Color to White
+	//vecOutNormal = vec3(modelToWorldMat * vec4(normal, 0));
+	vecOutNormal = mat3(transpose(inverse(modelToWorldMat)))* normal;
 };
 
 #shader FRAGMENT
 #version 430
 
+in vec3 fragPosition;
 in vec3 fragColor;
 in vec3 vecOutNormal;
-in vec3 fragPosition;
 
 uniform vec3 lightPos;
+uniform vec3 lightColor;
 uniform vec3 viewPos;
 
 out vec4 drawColor;
@@ -39,8 +40,15 @@ out vec4 drawColor;
 void main()
 {
 	// Ambient
-	float ambientLight = 0.2f;
+	float ambientStrength = 0.1f;
+	vec3 ambientColor = ambientStrength * lightColor;
 
+	vec3 lightDir = normalize(lightPos - fragPosition);
+	float diffuseStrength = max(dot(lightDir, normalize(vecOutNormal)), 0);
+	vec3 diffuseColor = diffuseStrength * lightColor;
+
+
+	/*
 	// Diffuse
 	float diffuseLight = 0.0f;
 	vec3 lightDir = normalize(lightPos - fragPosition);
@@ -55,5 +63,7 @@ void main()
 
 	float brightness = (ambientLight + diffuseLight + spec);
 	//drawColor = vec4(viewPos, 1.0f);
-	drawColor = brightness * vec4(fragColor, 1.0f);
+	*/
+	vec3 brightness = ambientColor + diffuseColor;
+	drawColor = vec4(brightness * fragColor, 1.0f);
 };
