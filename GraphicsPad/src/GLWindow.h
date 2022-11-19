@@ -18,7 +18,10 @@ private:
 	void sendData();
 	void installShaders();
 	
+	GLuint createAndLinkShader(const char* fileName);
 	void setShapeData(const Shape& shape);
+	inline void drawShape(Shape& shape, glm::mat4& modelToWorldMat, glm::mat4& worldToProjectionMat);
+	void drawShape(Shape& shape, glm::mat4& modelToWorldMat, glm::mat4& worldToProjectionMat, glm::vec3& modelColor);
 	void handleInput(QKeyEvent* event, bool pressed);
 	Vec2 translatePos(Vec2 initialPos, Vec2 speed, Vec4 bounds);
 
@@ -37,10 +40,11 @@ private:
 	// Uniforms
 	unsigned int colorId, scaleId, offsetId;
 	unsigned int modelToProjectionId, modelToWorldId, modelToViewId;
-	unsigned int lightPosId, lightColorId, viewPosId;
+	unsigned int lightPosId, lightColorId, viewPosId, modelColorId;
+	unsigned int passthrough_m2pId;
 
-	Shape plane, cube, sphere;
-	GLuint planeVAO, cubeVAO, sphereVAO;
+	Shape plane, cube, sphere, arrow, teapot;
+	GLuint planeVAO, cubeVAO, sphereVAO, arrowVAO, teapotVAO;
 
 	glm::vec3 lightPosition;
 	

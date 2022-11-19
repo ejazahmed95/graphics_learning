@@ -1,28 +1,26 @@
 #shader VERTEX
 #version 430
 
-in layout(location = 0) vec3 position;
+in layout(location = 0) vec4 position;
 in layout(location = 1) vec3 vertexColor;
-
-out vec3 vecOutColor;
 
 uniform mat4 transformMat;
 
+out vec3 fragColor;
+
 void main()
 {
-	vec4 pos = vec4(position, 1.0);
-	gl_Position = transformMat * pos;
-	vecOutColor = vertexColor;
-}
-;
+	gl_Position = transformMat * position;
+	fragColor = vec3(1,1,1);
+};
 
 #shader FRAGMENT
 #version 430
 
+in vec3 fragColor;
 out vec4 drawColor;
-in vec3 vecOutColor;
 
 void main()
 {
-	drawColor = 1.0f* vec4(vecOutColor, 0.5f);
+	drawColor = vec4(fragColor, 1);
 };

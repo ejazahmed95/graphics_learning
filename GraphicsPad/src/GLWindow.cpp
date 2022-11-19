@@ -51,10 +51,12 @@ void GLWindow::initData()
 
 	cubeRotation = 0;
 
-	lightPosition = glm::vec3(0.0f, 5.0f, 0.0f);
+	lightPosition = glm::vec3(-1.7f, 1.0f, -0.8f);
 	plane = ShapeGenerator::Plane();
 	cube = ShapeGenerator::Cube();
 	sphere = ShapeGenerator::Sphere();
+	arrow = ShapeGenerator::Arrow();
+	teapot = ShapeGenerator::Teapot();
 }
 
 void GLWindow::sendData() {
@@ -77,13 +79,17 @@ void GLWindow::sendData() {
 	glGenVertexArrays(1, &planeVAO);
 	glGenVertexArrays(1, &cubeVAO);
 	glGenVertexArrays(1, &sphereVAO);
+	glGenVertexArrays(1, &arrowVAO);
+	glGenVertexArrays(1, &teapotVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, bufferID); // Binding the Vertex Buffer (VBO)
-	glBufferData(GL_ARRAY_BUFFER, plane.fullBufferSize() + cube.fullBufferSize() + sphere.fullBufferSize(), 0, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, plane.fullBufferSize() + cube.fullBufferSize() + sphere.fullBufferSize() + arrow.fullBufferSize() + teapot.fullBufferSize(), 0, GL_STATIC_DRAW);
 
 	// Setting offsets on shapes for using the single buffer
 	plane.bufferOffset = 0;
 	cube.bufferOffset = plane.fullBufferSize();
 	sphere.bufferOffset = cube.bufferOffset + cube.fullBufferSize();
+	arrow.bufferOffset = sphere.bufferOffset + sphere.fullBufferSize();
+	teapot.bufferOffset = arrow.bufferOffset + arrow.fullBufferSize();
 
 	// Plane
 	glBindVertexArray(planeVAO); {
@@ -101,6 +107,18 @@ void GLWindow::sendData() {
 	glBindVertexArray(sphereVAO); { // All Vertex Attributes and Element Buffers will be bound to this VAO
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
 		setShapeData(sphere);
+	} glBindVertexArray(0);
+
+	// Arrow
+	glBindVertexArray(arrowVAO); { // All Vertex Attributes and Element Buffers will be bound to this VAO
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
+		setShapeData(arrow);
+	} glBindVertexArray(0);
+
+	// Teapot
+	glBindVertexArray(teapotVAO); { // All Vertex Attributes and Element Buffers will be bound to this VAO
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
+		setShapeData(teapot);
 	} glBindVertexArray(0);
 
 }
@@ -124,7 +142,7 @@ void GLWindow::paintGL() {
 	offset2 = translatePos(offset2, vel2 * deltaTime, Vec4{ -0.8f, 0.8f, -0.8f, 0.8f });
 
 	//std::cout << "{" << offset1.x  << ", " << offset1.y << "}" << std::endl;
-	glViewport(width() / 4, 0, width() / 2, height());
+	glViewport(0, 0, width(), height());
 	glClearColor(+0.0f, +0.0f, 0.0f, +1.0f);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
@@ -133,67 +151,86 @@ void GLWindow::paintGL() {
 	glm::mat4 viewToProjectionMat = glm::perspective(60.0f, ((float)width()) / height(), 0.1f, 20.0f);
 	glm::mat4 worldToViewMat = camera.getWorldToViewMatrix();
 	glm::mat4 worldToProjectionMat = viewToProjectionMat * worldToViewMat;
+	using glm::mat4;
 
 	glUseProgram(lightingProgram); {
-		using glm::mat4;
 		
-		glUniform3fv(lightPosId, 1, &lightPosition[0]);
-		glm::vec3 viewPosition = camera.getPosition();
+		glUniform3fv(lightPosId, 1, &lightPosition[0]); 
+		
+		glm::vec3 viewPosition = camera.getPosition(); 
 		glUniform3fv(viewPosId, 1, &viewPosition[0]);
-		glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
+		
+		glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f); 
 		glUniform3fv(lightColorId, 1, &lightColor[0]);
 		
+		using glm::vec3;
 		glBindVertexArray(planeVAO); { // Plane
-			mat4 translationMat = glm::translate(mat4(), glm::vec3(0.0f, -1.0f, -3.0f));
-			mat4 rotationMat = glm::rotate(cubeRotation, glm::vec3(1.0f, 0.0f, 0.0f));
-			mat4 scaleMat = glm::scale(mat4(), glm::vec3(1.0f, 1.0f, 1.0f));
-			mat4 modelToWorldMat = translationMat * rotationMat * scaleMat;
-
-			// Render the vertices in Camera's view
-			mat4 modelToProjection = worldToProjectionMat * modelToWorldMat;
-			glUniformMatrix4fv(modelToProjectionId, 1, GL_FALSE, &modelToProjection[0][0]);
-			glUniformMatrix4fv(modelToWorldId, 1, GL_FALSE, &modelToWorldMat[0][0]);
-			glDrawElements(GL_TRIANGLES, plane.numIndices, GL_UNSIGNED_SHORT, (GLvoid*)(plane.bufferOffset + plane.vertexBufferSize()));
-
+			drawShape(plane, glm::translate(0.0f, 0.0f, 0.0f), worldToProjectionMat);
 		} glBindVertexArray(0);
 
 		glBindVertexArray(cubeVAO); { // Cube
-			mat4 translationMat = glm::translate(mat4(), glm::vec3(-1.5f, 0.2f, -3.0f));
-			mat4 rotationMat = glm::rotate(cubeRotation, glm::vec3(1.0f, 0.0f, 0.0f));
-			mat4 scaleMat = glm::scale(mat4(), glm::vec3(0.5f, 0.5f, 0.5f));
-			mat4 modelToWorldMat = translationMat * rotationMat * scaleMat;
-
-			// Render the vertices in Camera's view
-			mat4 modelToProjection = worldToProjectionMat * modelToWorldMat;
-			glUniformMatrix4fv(modelToProjectionId, 1, GL_FALSE, &modelToProjection[0][0]);
-			glUniformMatrix4fv(modelToWorldId, 1, GL_FALSE, &modelToWorldMat[0][0]);
-			glDrawElements(GL_TRIANGLES, cube.numIndices, GL_UNSIGNED_SHORT, (GLvoid*)(cube.bufferOffset + cube.vertexBufferSize()));
-
+			drawShape(cube, glm::translate(vec3(3.0, 0, 3.0)) * glm::rotate(60.0f, vec3(1, 0, 0)), worldToProjectionMat, vec3(0.7, 0, 0));
+			drawShape(cube, glm::translate(vec3(0, 0, 3)) * glm::rotate(0.0f, vec3(1, 1, 0)) * glm::scale(vec3(0.3, 0.3, 0.3)), worldToProjectionMat, vec3(1, 0, 1));
 		} glBindVertexArray(0);
 
 		glBindVertexArray(sphereVAO); { // Sphere
-			mat4 translationMat = glm::translate(mat4(), glm::vec3(3.0f, -0.0f, -5.0f));
-			mat4 rotationMat = glm::rotate(cubeRotation, glm::vec3(1.0f, 0.0f, 0.0f));
-			mat4 scaleMat = glm::scale(mat4(), glm::vec3(1.0f, 1.0f, 1.0f));
-			mat4 modelToWorldMat = translationMat * rotationMat * scaleMat;
-
-			// Render the vertices in Camera's view
-			mat4 modelToProjection = worldToProjectionMat * modelToWorldMat;
-			glUniformMatrix4fv(modelToProjectionId, 1, GL_FALSE, &modelToProjection[0][0]);
-			glUniformMatrix4fv(modelToWorldId, 1, GL_FALSE, &modelToWorldMat[0][0]);
-			glDrawElements(GL_TRIANGLES, sphere.numIndices, GL_UNSIGNED_SHORT, (GLvoid*)(sphere.bufferOffset + sphere.vertexBufferSize()));
-
+			drawShape(sphere, glm::translate(vec3(0.0, 2, -3.0)) * glm::scale(vec3(0.2, 0.2, 0.2)), worldToProjectionMat, vec3(1, 0, 0));
+			drawShape(sphere, glm::translate(vec3(-1.0, 1, -1.0)) * glm::scale(vec3(0.2, 0.2, 0.2)), worldToProjectionMat, vec3(0, 1, 0));
+			drawShape(sphere, glm::translate(vec3(-3.0, 2, -1.0)) * glm::scale(vec3(0.2, 0.2, 0.2)), worldToProjectionMat, vec3(0, 0, 1));
 		} glBindVertexArray(0);
 
+		glBindVertexArray(arrowVAO); { // Sphere
+			drawShape(arrow, glm::translate(vec3(0.0, 0.2, -3.0)) * glm::rotate(30.0f, vec3(1, 0, 0)) * glm::scale(vec3(0.2, 0.2, 0.2)), worldToProjectionMat, vec3(1, 0.5, 0));
+			drawShape(arrow, glm::translate(vec3(-1.0, 0.4, -1.0)) * glm::rotate(90.0f, vec3(-2, 0, 1)) * glm::scale(vec3(0.2, 0.2, 0.2)), worldToProjectionMat, vec3(0.2, 1, 0));
+		} glBindVertexArray(0);
+
+		glBindVertexArray(teapotVAO); { // Sphere
+			drawShape(teapot, glm::translate(vec3(0.0, 0, -1.0)) * glm::rotate(-90.0f, vec3(1, 0, 0)) * glm::scale(vec3(0.2, 0.2, 0.2)), worldToProjectionMat, vec3(0.5, 0.2, 0.6));
+		} glBindVertexArray(0);
+
+	} //glUseProgram(0);
+
+	glUseProgram(passthroughProgram); {
+		glBindVertexArray(cubeVAO); { // Light
+			mat4 modelToWorldMat = glm::translate(lightPosition) * glm::scale(0.05f, 0.05f, 0.05f);
+			mat4 modelToProjection = worldToProjectionMat * modelToWorldMat;
+
+			glUniformMatrix4fv(passthrough_m2pId, 1, GL_FALSE, &modelToProjection[0][0]);
+			glDrawElements(GL_TRIANGLES, cube.numIndices, GL_UNSIGNED_SHORT, (GLvoid*)(cube.bufferOffset + cube.vertexBufferSize()));
+		} glBindVertexArray(0);
 	} glUseProgram(0);
 }
 
+void GLWindow::drawShape(Shape& shape, glm::mat4& modelToWorldMat, glm::mat4& worldToProjectionMat) {
+	drawShape(shape, modelToWorldMat, worldToProjectionMat, glm::vec3(1.0, 1.0, 1.0));
+}
+
+void GLWindow::drawShape(Shape& shape, glm::mat4& modelToWorldMat, glm::mat4& worldToProjectionMat, glm::vec3& modelColor) {
+	glm::mat4 modelToProjectionMat = worldToProjectionMat * modelToWorldMat;
+	glUniformMatrix4fv(modelToProjectionId, 1, GL_FALSE, &modelToProjectionMat[0][0]);
+	glUniformMatrix4fv(modelToWorldId, 1, GL_FALSE, &modelToWorldMat[0][0]);
+	glUniform3fv(modelColorId, 1, &modelColor[0]);
+	glDrawElements(GL_TRIANGLES, shape.numIndices, GL_UNSIGNED_SHORT, (GLvoid*)(shape.bufferOffset + shape.vertexBufferSize()));
+}
 
 void GLWindow::installShaders() {
+	lightingProgram = createAndLinkShader("resources/shaders/BasicLighting.shader");
+	modelToProjectionId = glGetUniformLocation(lightingProgram, "modelToProjectionMat");
+	modelToWorldId = glGetUniformLocation(lightingProgram, "modelToWorldMat");
+	lightPosId = glGetUniformLocation(lightingProgram, "lightPos");
+	lightColorId = glGetUniformLocation(lightingProgram, "lightColor");
+	viewPosId = glGetUniformLocation(lightingProgram, "viewPos");
+	modelColorId = glGetUniformLocation(lightingProgram, "modelColor");
+
+	passthroughProgram = createAndLinkShader("resources/shaders/MatTransformation.shader");
+	passthrough_m2pId = glGetUniformLocation(passthroughProgram, "transformMat");
+}
+
+GLuint GLWindow::createAndLinkShader(const char* fileName) {
 	// Set Shader Source
 	GLuint vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
 	GLuint fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
-	ShaderSource source = GetShaderSource("resources/shaders/BasicLighting.shader");
+	ShaderSource source = GetShaderSource(fileName);
 	const char* adapter[1];
 	adapter[0] = source.VertexSource.c_str();
 	glShaderSource(vertexShaderID, 1, adapter, 0);
@@ -205,16 +242,12 @@ void GLWindow::installShaders() {
 	glCompileShader(fragmentShaderID);
 
 	// Attach shader to a program id; Link Program
-	lightingProgram = glCreateProgram();
-	glAttachShader(lightingProgram, vertexShaderID);
-	glAttachShader(lightingProgram, fragmentShaderID);
-	glLinkProgram(lightingProgram);
+	GLuint programId = glCreateProgram();
+	glAttachShader(programId, vertexShaderID);
+	glAttachShader(programId, fragmentShaderID);
+	glLinkProgram(programId);
 
-	modelToProjectionId = glGetUniformLocation(lightingProgram, "transformMat");
-	modelToWorldId = glGetUniformLocation(lightingProgram, "modelToWorldMat");
-	lightPosId = glGetUniformLocation(lightingProgram, "lightPos");
-	lightColorId = glGetUniformLocation(lightingProgram, "lightColor");
-	viewPosId = glGetUniformLocation(lightingProgram, "viewPos");
+	return programId;
 }
 
 Vec2 GLWindow::translatePos(Vec2 initialPos, Vec2 speed, Vec4 bounds)

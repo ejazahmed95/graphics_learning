@@ -5,8 +5,9 @@ in layout(location = 0) vec3 position;
 in layout(location = 1) vec3 vertexColor;
 in layout(location = 2) vec3 normal;
 
-uniform mat4 transformMat; // Model To Projection Mat
+uniform mat4 modelToProjectionMat; // Model To Projection Mat
 uniform mat4 modelToWorldMat;
+uniform vec3 modelColor;
 
 // Interpolated Values outputted by vertex shader
 out vec3 fragPosition;
@@ -16,12 +17,13 @@ out vec3 vecOutNormal;
 void main()
 {
 	vec4 pos = vec4(position, 1.0);
-	gl_Position = transformMat * pos;
+	gl_Position = modelToProjectionMat * pos;
 
-	fragPosition = vec3(modelToWorldMat * vec4(position, 0));
-	fragColor = vec3(1.0, 1.0, 1.0); // Reset Color to White
-	//vecOutNormal = vec3(modelToWorldMat * vec4(normal, 0));
-	vecOutNormal = mat3(transpose(inverse(modelToWorldMat)))* normal;
+	fragPosition = vec3(modelToWorldMat * vec4(position, 1.0));
+	fragColor = modelColor;
+	vecOutNormal = vec3(modelToWorldMat * vec4(normal, 0.0));
+	//vecOutNormal = mat3(transpose(inverse(modelToWorldMat)))* normal;
+	//vecOutNormal = normal;
 };
 
 #shader FRAGMENT
@@ -39,31 +41,25 @@ out vec4 drawColor;
 
 void main()
 {
+	
 	// Ambient
 	float ambientStrength = 0.1f;
 	vec3 ambientColor = ambientStrength * lightColor;
 
-	vec3 lightDir = normalize(lightPos - fragPosition);
-	float diffuseStrength = max(dot(lightDir, normalize(vecOutNormal)), 0);
-	vec3 diffuseColor = diffuseStrength * lightColor;
-
-
-	/*
 	// Diffuse
-	float diffuseLight = 0.0f;
 	vec3 lightDir = normalize(lightPos - fragPosition);
-	diffuseLight = max(dot(lightDir, normalize(vecOutNormal)),0) * 0.8f;
+	float diffuseStrength = 0.7f;
+	float diffuseComponent = max(dot(lightDir, normalize(vecOutNormal)), 0);
+	vec3 diffuseColor = diffuseStrength * diffuseComponent * lightColor;
 
 	// Specular
-	float specularStrength = 0.5f;
+	float specularStrength = 0.8f;
 	vec3 viewDir = normalize(viewPos - fragPosition);
-	vec3 reflectDir = reflect(-lightDir, normalize(vecOutNormal));
-	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 300);
-	vec3 specular = spec * vec3(0.0, 1.0, 0.0) * specularStrength;
+	vec3 reflectDir = reflect(-lightDir, vecOutNormal);
+	float specularComponent = pow(max(dot(viewDir, reflectDir), 0.0), 50);
+	vec3 specularColor = specularStrength * specularComponent * vec3(1, 0, 0);
 
-	float brightness = (ambientLight + diffuseLight + spec);
-	//drawColor = vec4(viewPos, 1.0f);
-	*/
-	vec3 brightness = ambientColor + diffuseColor;
+	vec3 brightness = ambientColor + diffuseColor + specularColor;
 	drawColor = vec4(brightness * fragColor, 1.0f);
+	
 };
