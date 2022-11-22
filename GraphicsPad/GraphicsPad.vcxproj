@@ -167,6 +167,9 @@
     <None Include="resources\shaders\BasicLighting.shader" />
     <None Include="resources\shaders\MatTransformation.shader" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\textures\wall.jpg" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -121,6 +121,17 @@ void GLWindow::sendData() {
 		setShapeData(teapot);
 	} glBindVertexArray(0);
 
+	/*
+	int width, height, nrChannels;
+	unsigned char* data = stbi_load("resource/textures/wall.jpg", &width, &height, &nrChannels, 0);
+
+	GLuint texId;
+	glGenTextures(1, &texId);
+	glBindTexture(GL_TEXTURE_2D, texId);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	*/
+	
 }
 
 void GLWindow::setShapeData(const Shape& shape) {
@@ -169,23 +180,24 @@ void GLWindow::paintGL() {
 		} glBindVertexArray(0);
 
 		glBindVertexArray(cubeVAO); { // Cube
-			drawShape(cube, glm::translate(vec3(3.0, 0, 3.0)) * glm::rotate(60.0f, vec3(1, 0, 0)), worldToProjectionMat, vec3(0.7, 0, 0));
-			drawShape(cube, glm::translate(vec3(0, 0, 3)) * glm::rotate(0.0f, vec3(1, 1, 0)) * glm::scale(vec3(0.3, 0.3, 0.3)), worldToProjectionMat, vec3(1, 0, 1));
+			drawShape(cube, glm::translate(vec3(2.0, 3, 3.0)) * glm::rotate(60.0f, vec3(1, 0, 0)) * glm::scale(vec3(0.6, 0.6, 0.6)), worldToProjectionMat, vec3(1.0, 0.6, 0.6));
+			drawShape(cube, glm::translate(vec3(0, 2, 3)) * glm::rotate(0.0f, vec3(1, 1, 0)) * glm::scale(vec3(0.3, 0.3, 0.3)), worldToProjectionMat, vec3(1, 0.5, 1));
 		} glBindVertexArray(0);
 
 		glBindVertexArray(sphereVAO); { // Sphere
-			drawShape(sphere, glm::translate(vec3(0.0, 2, -3.0)) * glm::scale(vec3(0.2, 0.2, 0.2)), worldToProjectionMat, vec3(1, 0, 0));
-			drawShape(sphere, glm::translate(vec3(-1.0, 1, -1.0)) * glm::scale(vec3(0.2, 0.2, 0.2)), worldToProjectionMat, vec3(0, 1, 0));
-			drawShape(sphere, glm::translate(vec3(-3.0, 2, -1.0)) * glm::scale(vec3(0.2, 0.2, 0.2)), worldToProjectionMat, vec3(0, 0, 1));
+			drawShape(sphere, glm::translate(vec3(0.0, 2, -3.0)) * glm::scale(vec3(0.2, 0.2, 0.2)), worldToProjectionMat, vec3(1, 0.5, 0.5));
+			drawShape(sphere, glm::translate(vec3(-1.0, 0.2, -2.0)) * glm::scale(vec3(0.2, 0.4, 0.2)), worldToProjectionMat, vec3(0.5, 1, 0.5));
+			drawShape(sphere, glm::translate(vec3(-3.0, 2, -2.0)) * glm::scale(vec3(0.2, 0.2, 0.2)), worldToProjectionMat, vec3(0.7, .9, 0.3));
+			drawShape(sphere, glm::translate(vec3(-3.0, 2, -1.0)) * glm::scale(vec3(0.2, 0.2, 0.2)), worldToProjectionMat, vec3(0.5, 0.5, 1));
 		} glBindVertexArray(0);
 
-		glBindVertexArray(arrowVAO); { // Sphere
-			drawShape(arrow, glm::translate(vec3(0.0, 0.2, -3.0)) * glm::rotate(30.0f, vec3(1, 0, 0)) * glm::scale(vec3(0.2, 0.2, 0.2)), worldToProjectionMat, vec3(1, 0.5, 0));
-			drawShape(arrow, glm::translate(vec3(-1.0, 0.4, -1.0)) * glm::rotate(90.0f, vec3(-2, 0, 1)) * glm::scale(vec3(0.2, 0.2, 0.2)), worldToProjectionMat, vec3(0.2, 1, 0));
+		glBindVertexArray(arrowVAO); { // Arrow
+			drawShape(arrow, glm::translate(vec3(0.0, 0.2, 1.0)) * glm::rotate(30.0f, vec3(1, 2, 1)) * glm::scale(vec3(0.2, 0.2, 0.5)), worldToProjectionMat, vec3(1, 0.5, 0.2));
+			drawShape(arrow, glm::translate(vec3(-1.0, 0.4, 1.0)) * glm::rotate(90.0f, vec3(-2, 0.66, 1)) * glm::scale(vec3(0.3, 0.2, 0.3)), worldToProjectionMat, vec3(0.6, 1, 0.2));
 		} glBindVertexArray(0);
 
-		glBindVertexArray(teapotVAO); { // Sphere
-			drawShape(teapot, glm::translate(vec3(0.0, 0, -1.0)) * glm::rotate(-90.0f, vec3(1, 0, 0)) * glm::scale(vec3(0.2, 0.2, 0.2)), worldToProjectionMat, vec3(0.5, 0.2, 0.6));
+		glBindVertexArray(teapotVAO); { // Teapot
+			drawShape(teapot, glm::translate(vec3(-2.0, 0.5, 2.0)) * glm::rotate(-90.0f, vec3(1, 0, 0)) * glm::scale(vec3(0.2, 0.2, 0.2)), worldToProjectionMat, vec3(0.5, 0.4, 0.6));
 		} glBindVertexArray(0);
 
 	} //glUseProgram(0);

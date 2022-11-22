@@ -2,7 +2,7 @@
 #version 430
 
 in layout(location = 0) vec4 position;
-in layout(location = 1) vec3 vertexColor;
+in layout(location = 1) vec3 color;
 
 uniform mat4 transformMat;
 
@@ -11,7 +11,7 @@ out vec3 fragColor;
 void main()
 {
 	gl_Position = transformMat * position;
-	fragColor = vec3(1,1,1);
+	fragColor = color;
 };
 
 #shader FRAGMENT

@@ -20,7 +20,7 @@ void main()
 	gl_Position = modelToProjectionMat * pos;
 
 	fragPosition = vec3(modelToWorldMat * vec4(position, 1.0));
-	fragColor = modelColor;
+	fragColor = vec3(1,1,1);
 	vecOutNormal = vec3(modelToWorldMat * vec4(normal, 0.0));
 	//vecOutNormal = mat3(transpose(inverse(modelToWorldMat)))* normal;
 	//vecOutNormal = normal;
