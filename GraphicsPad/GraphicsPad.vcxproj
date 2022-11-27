@@ -160,6 +160,7 @@
     <ClInclude Include="src\GLWindow.h" />
     <ClInclude Include="src\ShaderLoader.h" />
     <ClInclude Include="src\core\Types.h" />
+    <ClInclude Include="src\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BasicColorPassing.shader" />

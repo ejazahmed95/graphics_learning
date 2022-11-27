@@ -15,6 +15,7 @@
     <ClInclude Include="src\core\Shape.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\core\Teapot.h" />
+    <ClInclude Include="src\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\BasicColorPassing.shader" />
