@@ -22,6 +22,7 @@
     <None Include="resources\shaders\BasicTransformation.shader" />
     <None Include="resources\shaders\MatTransformation.shader" />
     <None Include="resources\shaders\BasicLighting.shader" />
+    <None Include="resources\shaders\TexturePassing.shader" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\textures\wall.jpg" />

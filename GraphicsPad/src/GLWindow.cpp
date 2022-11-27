@@ -158,6 +158,8 @@ void GLWindow::setShapeData(const Shape& shape) {
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (char*)(shape.bufferOffset + sizeof(glm::vec3)));
 	glEnableVertexAttribArray(2); // Normal
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (char*)(shape.bufferOffset + sizeof(glm::vec3) * 2));
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (char*)(shape.bufferOffset + sizeof(glm::vec3) * 3));
 }
 
 /// <summary>
@@ -178,6 +180,22 @@ void GLWindow::paintGL() {
 	glm::mat4 worldToViewMat = camera.getWorldToViewMatrix();
 	glm::mat4 worldToProjectionMat = viewToProjectionMat * worldToViewMat;
 	using glm::mat4;
+	using glm::vec3;
+	glUseProgram(textureProgram); {
+		glUniform3fv(tex_lightPosId, 1, &lightPosition[0]);
+		glm::vec3 viewPosition = camera.getPosition();
+		glUniform3fv(tex_viewPosId, 1, &viewPosition[0]);
+		glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
+		glUniform3fv(tex_lightColorId, 1, &lightColor[0]);
+
+		glBindVertexArray(cubeVAO); {
+			glm::mat4 modelToWorldMat = glm::translate(vec3(0.0, 1, 0.0)) * glm::rotate(0.0f, vec3(1, 0, 0)) * glm::scale(vec3(0.6, 0.6, 0.6));
+			glm::mat4 modelToProjectionMat = worldToProjectionMat * modelToWorldMat;
+			glUniformMatrix4fv(texture_m2pId, 1, GL_FALSE, &modelToProjectionMat[0][0]);
+			glUniformMatrix4fv(tex_m2wId, 1, GL_FALSE, &modelToWorldMat[0][0]);
+			glDrawElements(GL_TRIANGLES, cube.numIndices, GL_UNSIGNED_SHORT, (GLvoid*)(cube.bufferOffset + cube.vertexBufferSize()));
+		} glBindVertexArray(0);
+	} glUseProgram(0);
 
 	glUseProgram(lightingProgram); {
 		
@@ -189,7 +207,6 @@ void GLWindow::paintGL() {
 		glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f); 
 		glUniform3fv(lightColorId, 1, &lightColor[0]);
 		
-		using glm::vec3;
 		glBindVertexArray(planeVAO); { // Plane
 			drawShape(plane, glm::translate(0.0f, 0.0f, 0.0f), worldToProjectionMat);
 		} glBindVertexArray(0);
@@ -251,6 +268,13 @@ void GLWindow::installShaders() {
 
 	passthroughProgram = createAndLinkShader("resources/shaders/MatTransformation.shader");
 	passthrough_m2pId = glGetUniformLocation(passthroughProgram, "transformMat");
+
+	textureProgram = createAndLinkShader("resources/shaders/TexturePassing.shader");
+	texture_m2pId = glGetUniformLocation(textureProgram, "modelToProjectionMat");
+	tex_m2wId = glGetUniformLocation(textureProgram, "modelToWorldMat");
+	tex_lightPosId = glGetUniformLocation(textureProgram, "lightPos");
+	tex_lightColorId = glGetUniformLocation(textureProgram, "lightColor");
+	tex_viewPosId = glGetUniformLocation(textureProgram, "viewPos");
 }
 
 GLuint GLWindow::createAndLinkShader(const char* fileName) {

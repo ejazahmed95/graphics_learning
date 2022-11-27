@@ -37,18 +37,28 @@ private:
 
 	float cubeRotation;
 
-	// Uniforms
 	unsigned int colorId, scaleId, offsetId;
+
+	// Lighting Shader
+	GLuint lightingProgram;
 	unsigned int modelToProjectionId, modelToWorldId, modelToViewId;
 	unsigned int lightPosId, lightColorId, viewPosId, modelColorId;
+	
+	// Texture With Lighting Shader
+	GLuint textureProgram;
+	unsigned int texture_m2pId, tex_m2wId, tex_lightPosId, tex_viewPosId, tex_lightColorId;
+
+	// Passthrough Shader
+	GLuint passthroughProgram;
 	unsigned int passthrough_m2pId;
 
+	// Shapes and VAOs
 	Shape plane, cube, sphere, arrow, teapot;
 	GLuint planeVAO, cubeVAO, sphereVAO, arrowVAO, teapotVAO;
 
 	glm::vec3 lightPosition;
 	
-	GLuint lightingProgram, passthroughProgram;
+	
 };
 
 std::string ToString(glm::vec3& v);
