@@ -29,13 +29,6 @@ private:
 
 	float deltaTime;
 	float lightMoveSpeed, speed2;
-	Vec2 vel1, vel2;
-	Vec2 offset1, offset2;
-	Vec2 scale1, scale2;
-
-	Vec3 color1, color2;
-
-	float cubeRotation;
 
 	unsigned int colorId, scaleId, offsetId;
 

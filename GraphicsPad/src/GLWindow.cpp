@@ -40,17 +40,6 @@ void GLWindow::initData()
 {
 	deltaTime = 0.2f;
 	lightMoveSpeed = 0.1f;
-	speed2 = 0.5f;
-	vel1 = { 0.0f, 0.0f };
-	vel2 = { 0.0f, 0.0f };
-	scale1 = { 0.1f, 0.1f };
-	scale2 = { 0.15f, 0.15f };
-	offset1 = { 0.4f, 0.1f };
-	offset2 = { -0.4f, 0.1f };
-	color1 = { 0.9f, 0.3f, 0.0f };
-	color2 = { 0.0f, 0.3f, 0.9f };
-
-	cubeRotation = 0;
 
 	lightPosition = glm::vec3(-1.7f, 1.0f, -0.8f);
 	plane = ShapeGenerator::Plane();
@@ -110,13 +99,10 @@ void GLWindow::sendData() {
 		// load and generate the texture
 		int width, height, nrChannels;
 		unsigned char* data = stbi_load("resources/textures/wall.jpg", &width, &height, &nrChannels, 0);
-		if (data)
-		{
+		if (data) {
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 			glGenerateMipmap(GL_TEXTURE_2D);
-		}
-		else
-		{
+		} else {
 			std::cout << "Failed to load texture" << std::endl;
 		}
 		stbi_image_free(data);
@@ -166,8 +152,6 @@ void GLWindow::setShapeData(const Shape& shape) {
 /// Painting the Window
 /// </summary>
 void GLWindow::paintGL() {
-	offset1 = translatePos(offset1, vel1 * deltaTime, Vec4{ -0.8f, 0.8f, -0.8f, 0.8f });
-	offset2 = translatePos(offset2, vel2 * deltaTime, Vec4{ -0.8f, 0.8f, -0.8f, 0.8f });
 
 	//std::cout << "{" << offset1.x  << ", " << offset1.y << "}" << std::endl;
 	glViewport(0, 0, width(), height());
@@ -189,7 +173,7 @@ void GLWindow::paintGL() {
 		glUniform3fv(tex_lightColorId, 1, &lightColor[0]);
 
 		glBindVertexArray(cubeVAO); {
-			glm::mat4 modelToWorldMat = glm::translate(vec3(0.0, 1, 0.0)) * glm::rotate(0.0f, vec3(1, 0, 0)) * glm::scale(vec3(0.6, 0.6, 0.6));
+			glm::mat4 modelToWorldMat = glm::translate(vec3(2.0, 1, 0.0)) * glm::rotate(30.0f, vec3(1, 0, 0)) * glm::scale(vec3(0.6, 0.6, 0.6));
 			glm::mat4 modelToProjectionMat = worldToProjectionMat * modelToWorldMat;
 			glUniformMatrix4fv(texture_m2pId, 1, GL_FALSE, &modelToProjectionMat[0][0]);
 			glUniformMatrix4fv(tex_m2wId, 1, GL_FALSE, &modelToWorldMat[0][0]);
@@ -334,7 +318,7 @@ void GLWindow::handleInput(QKeyEvent* event, bool pressed)
 {
 	float factor = pressed ? 1.0f : -0.0f;
 	float forceFactor = 500;
-
+	glm::vec3 forwardDir = camera.getViewDirection() * glm::vec3(1, 0, 1);
 	switch (event->key()) {
 	case Qt::Key::Key_W: // W
 		camera.moveForward();
@@ -355,22 +339,22 @@ void GLWindow::handleInput(QKeyEvent* event, bool pressed)
 		camera.moveUp();
 		break;
 	case Qt::Key::Key_Up:
-		lightPosition += lightMoveSpeed * camera.getUp();
+		lightPosition += lightMoveSpeed * forwardDir;
 		break;
 	case Qt::Key::Key_Left:
 		lightPosition += -lightMoveSpeed * camera.getStrafeDirection();
 		break;
 	case Qt::Key::Key_Down:
-		lightPosition += -lightMoveSpeed * camera.getUp();
+		lightPosition += -lightMoveSpeed * forwardDir;
 		break;
 	case Qt::Key::Key_Right:
 		lightPosition += lightMoveSpeed * camera.getStrafeDirection();
 		break;
-	case Qt::Key::Key_C: // Move Forward
-		lightPosition += lightMoveSpeed * camera.getViewDirection();
+	case Qt::Key::Key_C: 
+		lightPosition += lightMoveSpeed * camera.getUp();
 		break;
-	case Qt::Key::Key_X: // Move Backward
-		lightPosition += -lightMoveSpeed * camera.getViewDirection();
+	case Qt::Key::Key_X:
+		lightPosition += -lightMoveSpeed * camera.getUp();
 		break;
 	}
 	std::cout << "Light Position:" << ToString(lightPosition) << std::endl;
