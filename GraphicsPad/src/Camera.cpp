@@ -5,8 +5,8 @@
 const float Camera::MOVEMENT_SPEED = 0.1f;
 
 Camera::Camera() :
-	viewDirection(0.663740635f, -0.492421985f, 0.562995136f),
-	position(-3.11094999f, 2.23070025f, -2.86016989f),
+	viewDirection(0.865996, -0.379190, -0.346917),
+	position(-3.732485, 2.664902, 1.345825),
 	UP(0.0f, 1.0f, 0.0f)
 {
 	strafeDirection = glm::cross(viewDirection, UP);

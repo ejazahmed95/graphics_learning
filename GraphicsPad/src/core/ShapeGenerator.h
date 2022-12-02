@@ -8,6 +8,7 @@ public:
 	static Shape Triangle();
 	static Shape Cube();
 
+	static Shape SimplePlane();
 	static Shape Arrow();
 	static Shape Plane(uint dimensions = 10);
 	static Shape Teapot(uint tesselation = 10, const glm::mat4& lidTransform = glm::mat4());

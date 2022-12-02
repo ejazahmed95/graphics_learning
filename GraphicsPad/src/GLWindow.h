@@ -41,16 +41,22 @@ private:
 	GLuint textureProgram;
 	unsigned int texture_m2pId, tex_m2wId, tex_lightPosId, tex_viewPosId, tex_lightColorId;
 
+	// Normal Map with lighting
+	GLuint normalMapProgram;
+	unsigned int nmap_m2pId, nmap_m2wId, nmap_lightPosId, nmap_viewPosId, nmap_lightColorId;
+
 	// Passthrough Shader
 	GLuint passthroughProgram;
 	unsigned int passthrough_m2pId;
 
 	// Shapes and VAOs
-	Shape plane, cube, sphere, arrow, teapot;
-	GLuint planeVAO, cubeVAO, sphereVAO, arrowVAO, teapotVAO;
+	Shape plane, cube, sphere, arrow, teapot, simplePlane;
+	GLuint planeVAO, cubeVAO, sphereVAO, arrowVAO, teapotVAO, simplePlaneVAO;
 
 	glm::vec3 lightPosition;
 	
+	// Textures
+	GLuint texId, nmapId;
 	
 };
 

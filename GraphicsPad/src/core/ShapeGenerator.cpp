@@ -16,6 +16,40 @@ glm::vec3 randomColor()
 	return ret;
 }
 
+Shape ShapeGenerator::SimplePlane() {
+	Shape plane;
+	using glm::vec3;
+	using glm::vec2;
+	Vertex3D vertices[] = {
+		vec3(+1.0f, +1.0f, +1.0f),  // 16
+		vec3(+0.6f, +1.0f, +0.7f),  // Color
+		vec3(+0.0f, +0.0f, +1.0f),  // Normal 
+		vec2(1.0f, 0.0f), // Texture
+		vec3(-1.0f, +1.0f, +1.0f),  // 17
+		vec3(+0.6f, +0.4f, +0.8f),  // Color
+		vec3(+0.0f, +0.0f, +1.0f),  // Normal 
+		vec2(0.0f, 0.0f), // Texture
+		vec3(-1.0f, -1.0f, +1.0f),  // 18
+		vec3(+0.2f, +0.8f, +0.7f),  // Color
+		vec3(+0.0f, +0.0f, +1.0f),  // Normal 
+		vec2(0.0f, 1.0f), // Texture
+		vec3(+1.0f, -1.0f, +1.0f),  // 19
+		vec3(+0.2f, +0.7f, +1.0f),  // Color
+		vec3(+0.0f, +0.0f, +1.0f),  // Normal 
+		vec2(1.0f, 1.0f), // Texture
+	};
+	plane.numVertices = NUM_ARRAY_ELEMENTS(vertices);
+	plane.vertices = new Vertex3D[plane.numVertices];
+	memcpy(plane.vertices, vertices, sizeof(vertices));
+
+	GLushort indices[] = { 0, 1, 2, 0 , 2, 3 };
+	plane.numIndices = NUM_ARRAY_ELEMENTS(indices);
+	plane.indices = new GLushort[plane.numIndices];
+	memcpy(plane.indices, indices, sizeof(indices));
+
+	return plane;
+}
+
 Shape ShapeGenerator::Triangle() {
 	Shape triangle;
 
@@ -173,6 +207,52 @@ Shape ShapeGenerator::Cube() {
 
 	return cube;
 }
+
+/*
+Shape ShapeGenerator::BasicPlane() {
+	Shape ret;
+	using glm::vec3;
+	using glm::vec2;
+	Vertex3D stackVerts[] =
+	{
+		// Top side of arrow head
+		vec3(+0.00f, +0.25f, -0.25f),         // 0
+		vec3(+1.00f, +0.00f, +0.00f),		  // Color
+		vec3(+0.00f, +1.00f, +0.00f),         // Normal 
+ vec2(1.0f, 1.0f), // Texture
+		vec3(+0.50f, +0.25f, -0.25f),         // 1
+		vec3(+1.00f, +0.00f, +0.00f),		  // Color
+		vec3(+0.00f, +1.00f, +0.00f),         // Normal 
+ vec2(1.0f, 1.0f), // Texture
+		vec3(+0.00f, +0.25f, -1.00f),         // 2
+		vec3(+1.00f, +0.00f, +0.00f),		  // Color
+		vec3(+0.00f, +1.00f, +0.00f),         // Normal 
+ vec2(1.0f, 1.0f), // Texture
+		vec3(-0.50f, +0.25f, -0.25f),         // 3
+		vec3(+1.00f, +0.00f, +0.00f),		  // Color
+		vec3(+0.00f, +1.00f, +0.00f),         // Normal 
+ vec2(1.0f, 1.0f), // Texture
+ // Bottom side of arrow head
+ vec3(+0.00f, -0.25f, -0.25f),         // 4
+ vec3(+0.00f, +0.00f, +1.00f),		  // Color
+ vec3(+0.00f, -1.00f, +0.00f),         // Normal 
+	};
+
+	GLushort stackIndices[] = {
+		0, 1, 2, // Top
+		0, 2, 3,
+	};
+
+	ret.numVertices = sizeof(stackVerts) / sizeof(*stackVerts);
+	ret.vertices = new Vertex3D[ret.numVertices];
+	memcpy(ret.vertices, stackVerts, sizeof(stackVerts));
+
+	ret.numIndices = sizeof(stackIndices) / sizeof(*stackIndices);
+	ret.indices = new GLushort[ret.numIndices];
+	memcpy(ret.indices, stackIndices, sizeof(stackIndices));
+	return ret;
+}
+*/
 
 Shape ShapeGenerator::Plane(uint dimensions)
 {
