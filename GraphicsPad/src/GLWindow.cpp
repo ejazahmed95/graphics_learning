@@ -309,11 +309,11 @@ void GLWindow::installShaders() {
 	tex_viewPosId = glGetUniformLocation(textureProgram, "viewPos");
 
 	normalMapProgram = createAndLinkShader("resources/shaders/NormalMap.shader");
-	nmap_m2pId = glGetUniformLocation(textureProgram, "modelToProjectionMat");
-	nmap_m2wId = glGetUniformLocation(textureProgram, "modelToWorldMat");
-	nmap_lightPosId = glGetUniformLocation(textureProgram, "lightPos");
-	nmap_lightColorId = glGetUniformLocation(textureProgram, "lightColor");
-	nmap_viewPosId = glGetUniformLocation(textureProgram, "viewPos");
+	nmap_m2pId = glGetUniformLocation(normalMapProgram, "modelToProjectionMat");
+	nmap_m2wId = glGetUniformLocation(normalMapProgram, "modelToWorldMat");
+	nmap_lightPosId = glGetUniformLocation(normalMapProgram, "lightPos");
+	nmap_lightColorId = glGetUniformLocation(normalMapProgram, "lightColor");
+	nmap_viewPosId = glGetUniformLocation(normalMapProgram, "viewPos");
 }
 
 GLuint GLWindow::createAndLinkShader(const char* fileName) {

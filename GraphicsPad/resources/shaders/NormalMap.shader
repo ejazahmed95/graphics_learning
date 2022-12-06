@@ -63,7 +63,6 @@ void main()
 	vec3 specularColor = specularStrength * specularComponent * vec3(1, 0, 0);
 
 	vec3 brightness = ambientColor + diffuseColor + specularColor;
-
 	drawColor = vec4(brightness * fragColor, 1.0f);
 	//drawColor = texture(tex, fragTexCoord);
 };
